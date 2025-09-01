@@ -1,0 +1,21 @@
+OLTP (origin) database:
+  * json
+
+Data staging, loading:
+  * ETL tools (pgloader)
+  * FDW
+
+Data Warehouse storage:
+  * materialized views
+  * unlogged tables?
+
+Data marts:
+  * hot standby (subsidiary reporting servers)
+
+Querying:
+  * PL/R, MADlib <--  intelligence in database (no data transfer)
+  * generic PL stuff
+  * window functions
+  * bitmap scan
+  * BRIN indexes (was "minmax")
+  * maybe also mention: greenplum

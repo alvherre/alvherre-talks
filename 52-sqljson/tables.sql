@@ -1,0 +1,303 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17beta1
+-- Dumped by pg_dump version 17beta1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: address_address_id_seq; Type: SEQUENCE; Schema: public; Owner: alvherre
+--
+
+CREATE SEQUENCE public.address_address_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.address_address_id_seq OWNER TO alvherre;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: address; Type: TABLE; Schema: public; Owner: alvherre
+--
+
+CREATE TABLE public.address (
+    address_id integer DEFAULT nextval('public.address_address_id_seq'::regclass) NOT NULL,
+    address text NOT NULL,
+    address2 text,
+    district text NOT NULL,
+    city_id integer NOT NULL,
+    postal_code text,
+    phone text NOT NULL,
+    last_update timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.address OWNER TO alvherre;
+
+--
+-- Name: city_city_id_seq; Type: SEQUENCE; Schema: public; Owner: alvherre
+--
+
+CREATE SEQUENCE public.city_city_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.city_city_id_seq OWNER TO alvherre;
+
+--
+-- Name: city; Type: TABLE; Schema: public; Owner: alvherre
+--
+
+CREATE TABLE public.city (
+    city_id integer DEFAULT nextval('public.city_city_id_seq'::regclass) NOT NULL,
+    city text NOT NULL,
+    country_id integer NOT NULL,
+    last_update timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.city OWNER TO alvherre;
+
+--
+-- Name: country_country_id_seq; Type: SEQUENCE; Schema: public; Owner: alvherre
+--
+
+CREATE SEQUENCE public.country_country_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.country_country_id_seq OWNER TO alvherre;
+
+--
+-- Name: country; Type: TABLE; Schema: public; Owner: alvherre
+--
+
+CREATE TABLE public.country (
+    country_id integer DEFAULT nextval('public.country_country_id_seq'::regclass) NOT NULL,
+    country text NOT NULL,
+    last_update timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.country OWNER TO alvherre;
+
+--
+-- Name: staff_staff_id_seq; Type: SEQUENCE; Schema: public; Owner: alvherre
+--
+
+CREATE SEQUENCE public.staff_staff_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.staff_staff_id_seq OWNER TO alvherre;
+
+--
+-- Name: staff; Type: TABLE; Schema: public; Owner: alvherre
+--
+
+CREATE TABLE public.staff (
+    staff_id integer DEFAULT nextval('public.staff_staff_id_seq'::regclass) NOT NULL,
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    address_id integer NOT NULL,
+    email text,
+    store_id integer NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    username text NOT NULL,
+    password text,
+    last_update timestamp with time zone DEFAULT now() NOT NULL,
+    picture bytea
+);
+
+
+ALTER TABLE public.staff OWNER TO alvherre;
+
+--
+-- Name: store_store_id_seq; Type: SEQUENCE; Schema: public; Owner: alvherre
+--
+
+CREATE SEQUENCE public.store_store_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.store_store_id_seq OWNER TO alvherre;
+
+--
+-- Name: store; Type: TABLE; Schema: public; Owner: alvherre
+--
+
+CREATE TABLE public.store (
+    store_id integer DEFAULT nextval('public.store_store_id_seq'::regclass) NOT NULL,
+    manager_staff_id integer NOT NULL,
+    address_id integer NOT NULL,
+    last_update timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.store OWNER TO alvherre;
+
+--
+-- Name: address address_pkey; Type: CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.address
+    ADD CONSTRAINT address_pkey PRIMARY KEY (address_id);
+
+
+--
+-- Name: city city_pkey; Type: CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.city
+    ADD CONSTRAINT city_pkey PRIMARY KEY (city_id);
+
+
+--
+-- Name: country country_pkey; Type: CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.country
+    ADD CONSTRAINT country_pkey PRIMARY KEY (country_id);
+
+
+--
+-- Name: staff staff_pkey; Type: CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.staff
+    ADD CONSTRAINT staff_pkey PRIMARY KEY (staff_id);
+
+
+--
+-- Name: store store_pkey; Type: CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.store
+    ADD CONSTRAINT store_pkey PRIMARY KEY (store_id);
+
+
+--
+-- Name: idx_fk_city_id; Type: INDEX; Schema: public; Owner: alvherre
+--
+
+CREATE INDEX idx_fk_city_id ON public.address USING btree (city_id);
+
+
+--
+-- Name: idx_fk_country_id; Type: INDEX; Schema: public; Owner: alvherre
+--
+
+CREATE INDEX idx_fk_country_id ON public.city USING btree (country_id);
+
+
+--
+-- Name: idx_unq_manager_staff_id; Type: INDEX; Schema: public; Owner: alvherre
+--
+
+CREATE UNIQUE INDEX idx_unq_manager_staff_id ON public.store USING btree (manager_staff_id);
+
+
+--
+--
+
+
+
+--
+--
+
+
+
+--
+--
+
+
+
+--
+--
+
+
+
+--
+--
+
+
+
+--
+-- Name: address address_city_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.address
+    ADD CONSTRAINT address_city_id_fkey FOREIGN KEY (city_id) REFERENCES public.city(city_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: city city_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.city
+    ADD CONSTRAINT city_country_id_fkey FOREIGN KEY (country_id) REFERENCES public.country(country_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: staff staff_address_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.staff
+    ADD CONSTRAINT staff_address_id_fkey FOREIGN KEY (address_id) REFERENCES public.address(address_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: staff staff_store_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.staff
+    ADD CONSTRAINT staff_store_id_fkey FOREIGN KEY (store_id) REFERENCES public.store(store_id);
+
+
+--
+-- Name: store store_address_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alvherre
+--
+
+ALTER TABLE ONLY public.store
+    ADD CONSTRAINT store_address_id_fkey FOREIGN KEY (address_id) REFERENCES public.address(address_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

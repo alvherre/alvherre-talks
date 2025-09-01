@@ -1,0 +1,14 @@
+\frametitle{\texttt{XMLTABLE}}
+\footnotesize
+\begin{lstlisting}
+SELECT xmltable.*
+  FROM hoteldata,
+       XMLTABLE ('/hotels/hotel/rooms/room' PASSING hotels
+                 COLUMNS
+                    id FOR ORDINALITY,
+                    hotel_name text PATH '../../name' NOT NULL,
+                    room_id int PATH '@id' NOT NULL,
+                    capacity int,
+                    comment text PATH 'comment' DEFAULT 'A regular room'
+                );
+\end{lstlisting}

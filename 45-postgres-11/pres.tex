@@ -1,0 +1,631 @@
+\begin{frame}
+\frametitle{Acerca de 2ndQuadrant}
+
+\begin{itemize}
+\item Empresa de servicios y soporte a PostgreSQL
+\item Auspiciador principal de la comunidad PostgreSQL
+\item Desarrolladores de características principales de PostgreSQL
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sobre Álvaro Herrera}
+
+\begin{itemize}
+\item Desarrollador de PostgreSQL desde 2002
+\item Committer de PostgreSQL desde 2005
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Introducción a PostgreSQL 11}
+
+\begin{itemize}
+\item Un año de desarrollo desde PostgreSQL 10
+\item >180 cambios listados en ``release notes''
+\item >2200 commits
+\item 313 contribuidores
+\item 5445 archivos, 950.959 SLOC
+\item 3150 archivos cambiados
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{La versión 11 de PostgreSQL}
+
+\begin{itemize}
+\item liberada el 8 de noviembre
+\item ``feature freeze'' en abril
+\item Soporte comunitario durante 5 años
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Mejoras en el particionamiento}
+
+\begin{itemize}
+\item particionamiento declarativo es nuevo en PostgreSQL 10
+\item Mejoras en PostgreSQL 11:
+
+\begin{itemize}
+\item particionamiento por hash
+\item partición por omisión
+\item actualización de llave de particionamiento
+\item soporte para llaves primarias y foráneas, índices y triggers en tablas particionadas
+\item ``poda'' de particiones en tiempo de ejecución
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Particionamiento por hash}
+
+\footnotesize
+\begin{lstlisting}
+CREATE TABLE clientes (
+   cliente_id     bigint   NOT NULL,
+   nombre_cliente text     NOT NULL,
+   direccion      text,
+   pais           text
+) PARTITION BY HASH (nombre_cliente);
+CREATE TABLE clientes_p1 PARTITION OF clientes
+   FOR VALUES WITH (MODULUS 4, REMAINDER 0);
+CREATE TABLE clientes_p2 PARTITION OF clientes
+   FOR VALUES WITH (MODULUS 4, REMAINDER 1);
+CREATE TABLE clientes_p3 PARTITION OF clientes
+   FOR VALUES WITH (MODULUS 4, REMAINDER 2);
+CREATE TABLE clientes_p4 PARTITION OF clientes
+   FOR VALUES WITH (MODULUS 4, REMAINDER 3);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Particionamiento por hash}
+
+\footnotesize
+\begin{lstlisting}
+CREATE TABLE clientes (
+   cliente_id      bigint  NOT NULL,
+   nombre_cliente  text    NOT NULL,
+   direccion       text,
+   pais            text
+) PARTITION BY HASH (nombre_cliente);
+CREATE TABLE clientes_p1 PARTITION OF clientes
+   FOR VALUES WITH (MODULUS 4, REMAINDER 0);
+CREATE TABLE clientes_p2 PARTITION OF clientes
+   FOR VALUES WITH (MODULUS 4, REMAINDER 1);
+
+CREATE TABLE clientes_p3a PARTITION OF clientes
+    FOR VALUES WITH (MODULUS 8, REMAINDER 2);
+CREATE TABLE clientes_p3b PARTITION OF clientes
+    FOR VALUES WITH (MODULUS 8, REMAINDER 6);
+
+CREATE TABLE clientes_p4 PARTITION OF clientes
+  FOR VALUES WITH (MODULUS 4, REMAINDER 3);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Partición por omisión}
+
+\footnotesize
+\begin{lstlisting}
+CREATE TABLE clientes (
+  cliente_id      bigint NOT NULL,
+  nombre_cliente  text NOT NULL,
+  direccion       text,
+  pais            text
+) PARTITION BY LIST (pais);
+
+CREATE TABLE clientes_us PARTITION OF clientes FOR VALUES IN ('us');
+CREATE TABLE clientes_de PARTITION OF clientes FOR VALUES IN ('de');
+
+CREATE TABLE customers_def PARTITION OF customers DEFAULT;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Actualización de llave de particionamiento}
+
+\footnotesize
+\begin{lstlisting}
+UPDATE clientes
+  SET pais = 'fr'
+  WHERE cliente_id = 12345;
+\end{lstlisting}
+
+\begin{itemize}
+\item Convertido internamente a INSERT + DELETE
+\item (¡cuidado con update/delete concurrente!)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Índices y llaves en tablas particionadas}
+
+\footnotesize
+\begin{lstlisting}
+CREATE TABLE clientes (
+cliente_id      bigint NOT NULL,
+nombre_cliente  text PRIMARY KEY, -- debe contener llave de particionamiento
+direccion       text,
+pais            text REFERENCES paises
+) PARTITION BY HASH (cnombre_cliente);
+
+CREATE INDEX ON clientes (pais);
+
+/* obtiene llave primaria e indices automaticamente: */
+CREATE TABLE clientes_p1 PARTITION OF clientes ...
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Triggers en tablas particionadas}
+
+\footnotesize
+\begin{lstlisting}
+CREATE TRIGGER trg AFTER UPDATE OR INSERT ON TABLE clientes
+  FOR EACH ROW EXECUTE PROCEDURE verifica_consist_cliente()
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Poda más rápida}
+
+  \begin{itemize}
+    \item Exclusión por restricciones es lenta y limitada
+    \item Poda de particiones es tecnología completamente nueva, más avanzada
+    \item Produce un ``programa de poda'' a partir del WHERE y los límites de cada partición
+    \item Inicialmente, la poda se aplica en tiempo de optimización
+      \begin{itemize}
+	\item tal como exclusión por restricciones
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Ejemplo de poda}
+\footnotesize
+\begin{lstlisting}
+EXPLAIN (ANALYZE, COSTS off)
+   SELECT * FROM clientes
+   WHERE cliente_id = 1234;
+                               QUERY PLAN                               
+----------------------------------------------------------------------
+ Append (actual time=0.054..2.787 rows=1 loops=1)
+   ->  Seq Scan on clientes_2 (actual time=0.052..2.785 rows=1 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12570
+ Planning Time: 0.292 ms
+ Execution Time: 2.822 ms
+(6 filas)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Ejemplo sin poda}
+\footnotesize
+\begin{lstlisting}
+SET enable_partition_pruning TO off;
+EXPLAIN (ANALYZE, COSTS off)
+   SELECT * FROM clientes
+   WHERE cliente_id = 1234;
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Append (actual time=6.658..10.549 rows=1 loops=1)
+   ->  Seq Scan on clientes_1 (actual time=4.724..4.724 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 24978
+   ->  Seq Scan on clientes_00 (actual time=1.914..1.914 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12644
+   ->  Seq Scan on clientes_2 (actual time=0.017..1.021 rows=1 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12570
+   ->  Seq Scan on clientes_3 (actual time=0.746..0.746 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12448
+   ->  Seq Scan on clientes_01 (actual time=0.648..0.648 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12482
+   ->  Seq Scan on clientes_4 (actual time=0.774..0.774 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12400
+   ->  Seq Scan on clientes_5 (actual time=0.717..0.717 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12477
+ Planning Time: 0.375 ms
+ Execution Time: 10.603 ms
+(24 filas)
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Poda en tiempo de ejecución}
+
+  \begin{itemize}
+    \item La poda de particiones puede aplicarse en tiempo de ejecución
+    \item Muchas consultas se pueden optimizar mejor en este punto
+    \item Dos momentos para aplicar poda:
+      \begin{itemize}
+	\item Cuando se entregan los valores de los parámetros (bind)
+	\item Cuando valores para columnas surgen desde otro nodo
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Ejemplo de poda en tiempo de ejecución}
+\footnotesize
+\begin{lstlisting}
+explain (analyze, costs off, summary off, timing off)
+   execute ab_q1 (2, 2, 3);
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Append (actual rows=0 loops=1)
+   Subplans Removed: 6
+   ->  Seq Scan on ab_a2_b1 (actual rows=0 loops=1)
+         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+   ->  Seq Scan on ab_a2_b2 (actual rows=0 loops=1)
+         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+   ->  Seq Scan on ab_a2_b3 (actual rows=0 loops=1)
+         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+(8 rows)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Otro ejemplo de poda en tiempo de ejecución}
+\footnotesize
+\begin{lstlisting}
+explain (analyze, costs off, summary off, timing off)
+select * from tbl1 join tbl2 on tbl1.col1 < tbl2.col1;
+                                QUERY PLAN                                
+--------------------------------------------------------------------------
+ Nested Loop (actual rows=1 loops=1)
+   ->  Seq Scan on tbl1 (actual rows=1 loops=1)
+   ->  Append (actual rows=1 loops=1)
+         ->  Index Scan using tbl2_1_idx on tbl2_1 (never executed)
+               Index Cond: (tbl1.col1 < col1)
+         ->  Index Scan using tbl2_2_idx on tbl2_2 (never executed)
+               Index Cond: (tbl1.col1 < col1)
+         ->  Index Scan using tbl2_5_idx on tbl2_5 (never executed)
+               Index Cond: (tbl1.col1 < col1)
+         ->  Index Scan using tbl2_6_idx on tbl2_6 (actual rows=1 loops=1)
+               Index Cond: (tbl1.col1 < col1)
+(15 rows)
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Procedimientos almacenados}
+
+\begin{itemize}
+  \item Similares a funciones
+  \item no retornan valores
+  \item se invocan con CALL
+  \item todos los lenguajes/PLs están soportados
+  \item pueden iniciar/terminar transacciones
+  \item compatible con DB2, Oracle
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Ejemplo de procedimiento almacenado}
+
+\begin{lstlisting}
+CREATE PROCEDURE nuevo_cliente(nombre text, direccion
+text)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  INSERT INTO clientes VALUES (nombre, direccion);
+END
+$$;
+
+CALL nuevo_cliente ('su nombre', 'una direccion');
+
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Procedimientos con transacciones}
+
+\footnotesize
+\begin{lstlisting}
+
+CREATE PROCEDURE transaction_test1(x int, y text)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    FOR i IN 0..x LOOP
+        INSERT INTO test1 (a, b) VALUES (i, y);
+	IF i % 2 = 0 THEN
+            COMMIT;
+        ELSE
+            ROLLBACK;
+        END IF;
+    END LOOP;
+END
+$$;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Ejemplo: UPDATE en lotes}
+
+\footnotesize
+\url{http://www.postgresonline.com/journal/index.php?/archives/390-Using-procedures-for-batch-geocoding-and-other-batch-processing.html}
+\begin{lstlisting}
+CREATE OR REPLACE PROCEDURE batch_geocode()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  WHILE EXISTS (SELECT 1 FROM addr_to_geocode WHERE pt IS NULL) LOOP
+    WITH a AS (SELECT addid, address FROM addr_to_geocode WHERE pt IS NULL
+               ORDER BY addid LIMIT 5 FOR UPDATE SKIP LOCKED)
+    UPDATE addr_to_geocode SET pt = ST_SetSRID(g.geomout,4326)::geography
+      FROM (SELECT addid, (gc).rating, (gc).addy, (gc).geomout
+              FROM a LEFT JOIN LATERAL geocode(address,1) AS gc ON (true)
+           ) AS g
+     WHERE g.addid = addr_to_geocode.addid;
+
+     COMMIT;
+  END LOOP;
+END;
+$$;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Índices \emph{covering}}
+
+\begin{itemize}
+  \item \texttt{CREATE INDEX ON tabla (a, b) INCLUDE (c)}
+  \item Columna extra sirve para recorridos de sólo-índice
+  \item Pueden incluirse columnas sin soporte b-tree (ej. geometrías)
+  \item Recuerde hacer VACUUM
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{ALTER TABLE .. ADD COLUMN .. DEFAULT}
+
+  \begin{itemize}
+    \item antiguamente requería reescribir la tabla completa
+  \end{itemize}
+
+\begin{lstlisting}
+-- PostgreSQL 10
+=# alter table t add column c text default 'hola';
+ALTER TABLE
+Time: 128021,645 ms (02:08,022)
+\end{lstlisting}
+
+  \begin{itemize}
+    \item ahora es sólo un cambio en catálogo
+  \end{itemize}
+
+\begin{lstlisting}
+-- PostgreSQL 11
+=# alter table t add column c text default 'hola';
+ALTER TABLE
+Time: 59,857 ms
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Mejoras al paralelismo}
+
+\begin{itemize}
+  \item Consultas en paralelo introducidas en PostgreSQL 9.6
+    \begin{itemize}
+      \item recorrido secuencial
+      \item agregación
+    \end{itemize}
+  \item mejoras en PostgreSQL 10
+   \begin{itemize}
+     \item recorridos de índice
+     \item merge join
+     \item subconsultas
+     \item mejor configuración
+   \end{itemize}
+ \item mejoras en PostgreSQL 11
+   \begin{itemize}
+     \item Hash join
+     \item \texttt{CREATE TABLE AS}, \texttt{CREATE MATERIALIZED VIEW}
+     \item \texttt{CREATE INDEX} para btree
+   \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Hash join en paralelo}
+
+\footnotesize
+\begin{lstlisting}
+EXPLAIN SELECT count(*) FROM r JOIN s USING (id);
+
+                        QUERY PLAN
+-------------------------------------------------------------
+Finalize Aggregate
+  -> Gather
+     Workers Planned: 2
+     -> Partial Aggregate
+        -> Parallel Hash Join
+           Hash Cond: (r.id = s.id)
+           -> Parallel Seq Scan on r
+           -> Parallel Hash
+              -> Parallel Seq Scan on s
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{DDL en paralelo}
+
+  \begin{itemize}
+    \item CREATE TABLE AS
+    \item CREATE MATERIALIZED VIEW
+    \item{índices btree en paralelo}
+    \end{itemize}
+
+  \begin{itemize}
+    \item automático
+    \item sujeto a \texttt{max\_parallel\_maintenance\_workers}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Compilación JIT}
+
+  \begin{itemize}
+    \item JIT compila algunas partes de las consultas a código de máquina
+    \item la compilación tiene un costo
+       \begin{itemize}
+	  \item sólo para consultas grandes (OLAP / BI / DWH)
+       \end{itemize}
+    \item requiere LLVM
+    \item desactivado por omisión (\texttt{jit=off})
+    \item \texttt{jit\_above\_cost}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Qué se JIT-compila}
+
+  \begin{itemize}
+    \item evaluación de expresiones
+      \begin{itemize}
+	\item \texttt{WHERE a + b > 55}
+      \end{itemize}
+    \item deconstrucción de tuplas
+      \begin{itemize}
+	\item \texttt{clientes.direccion}
+      \end{itemize}
+  \end{itemize}
+
+  Además:
+  \begin{itemize}
+    \item optimización adicional del compilador (\texttt{-O3})
+      \begin{itemize}
+	\item \texttt{jit\_optimize\_above\_cost}
+      \end{itemize}
+    \item \emph{inline} de funciones
+      \begin{itemize}
+	\item \texttt{jit\_inline\_above\_cost}
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Ejemplo de JIT}
+
+\footnotesize
+\begin{lstlisting}
+EXPLAIN ANALYZE SELECT sum(relpages) FROM pg_class;
+                                    QUERY PLAN
+-----------------------------------------------------------------------------------
+Aggregate (cost=16.27..16.29 rows=1 width=8) (actual time=6.049..6.049 rows=1 loops=1)
+  -> Seq Scan on pg_class (cost=0.00..15.42 rows=342 width=4) (actual time=0.019..0.052 rows=356 loops=1)
+  Planning Time: 0.133 ms
+  JIT:
+    Functions: 3
+    Generation Time: 1.259 ms
+    Inlining: false
+    Inlining Time: 0.000 ms
+    Optimization: false
+    Optimization Time: 0.797 ms
+    Emission Time: 5.048 ms
+  Execution Time: 7.416 ms
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Configuración por omisión}
+
+\begin{lstlisting}
+jit_above_cost = 100000
+jit_inline_above_cost = 500000
+jit_optimize_above_cost = 500000
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Mejoras de seguridad}
+
+\begin{itemize}
+  \item \emph{Passphrases} en SSL
+  \item se desactivó la compresión en SSL
+  \item enlazado (\emph{binding}) de canal SCRAM
+  \item \texttt{ldapsearchfilter}
+  \item \texttt{ldaps://}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Más cambios menores}
+
+  \begin{itemize}
+    \item Soporte para particiones en FDW (insert, update, delete, copy)
+    \item Tamaño de segmento WAL (16 MB) se puede cambiar durante \texttt{initdb}
+    \item replicación lógica soporta \texttt{TRUNCATE}
+    \item más opciones de \emph{frame} en funciones ventana
+    \item funciones SHA-2
+    \item \texttt{psql} reconoce órdenes \texttt{exit} y \texttt{quit}
+    \item \texttt{pg\_verify\_checksums}
+  \end{itemize}
+
+  \url{https://www.postgresql.org/docs/devel/static/release-11.html}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Mirando al futuro}
+
+    \begin{itemize}
+      \item PostgreSQL 12 ya está en progreso
+      \item rendimiento con tablas particionadas
+      \item mejoras en JIT (\texttt{jit=on})
+      \item motores de almacenamiento
+      \item mejoras de seguridad
+      \item mejoras de HA/replicación
+      \item mucho más
+    \end{itemize}
+
+    \url{https://commitfest.postgresql.org/18/} en adelante
+\end{frame}
+
+\begin{frame}
+  \frametitle{Resumen: PostgreSQL 11}
+  \begin{itemize}
+    \item particionamiento
+    \item paralelismo
+    \item procedimientos
+    \item JIT
+    \item y más
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{¿Preguntas?}
+
+  \begin{itemize}
+    \item Blog: \url{https://blog.2ndquadrant.com}
+    \item Sitio web: \url{https://www.2ndquadrant.com}
+    \item email: \url{info@2ndquadrant.com}
+  \end{itemize}
+\end{frame}

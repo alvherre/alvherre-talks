@@ -1,0 +1,61 @@
+% :vim:set sw=3:
+\newcommand{\linksize}{\scriptsize}
+%\newcommand{\textrightarrow}{$\,\to\,$}
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}
+	\frametitle{Álvaro Herrera}
+  \begin{itemize}
+    \item Álvaro Herrera, \href{mailto:alvherre@kurilemu.de}{alvherre@kurilemu.de}
+    \item Postgres contributor since 2002
+    \item Working as a Postgres developer for 2ndQuadrant/EDB since 2012
+\begin{itemize} \item \linksize Feel free to grab hold of me on hallways to talk about stuff \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Talk structure}
+  \begin{enumerate}
+    \item The problem: table bloat
+    \item The historical solution: VACUUM FULL
+    \item Third-party solutions
+	    \begin{itemize}
+		    \item \emph{pg\_repack}
+		    \item \emph{pg\_squeeze}
+	    \end{itemize}
+    \item Non-concurrent REPACK
+    \item REPACK CONCURRENTLY
+  \end{enumerate}
+\end{frame}
+
+\section{Historical review}
+
+\begin{frame}
+	\frametitle{The problem: table bloat}
+\end{frame}
+
+\begin{frame}
+	\frametitle{VACUUM FULL}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\texttt{pg\_repack}}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\texttt{pg\_squeeze}}
+\end{frame}
+
+\section{Repacking done right}
+\begin{frame}
+	\frametitle{The REPACK command}
+\end{frame}
+
+\subsection{Concurrent Repacking}
+\begin{frame}
+	\frametitle{REPACK CONCURRENTLY}
+\end{frame}

@@ -1,0 +1,17 @@
+\frametitle{Helper functions}
+
+\begin{itemize}
+\item \texttt{pg\_event\_trigger\_expand\_command(jsonb)}
+\end{itemize}
+
+\begin{lstlisting}
+CREATE UNLOGGED TABLE public.t1
+     (a pg_catalog.int4
+      DEFAULT nextval('t1_a_seq'::regclass)
+      NOT NULL )
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{jsonb\_set(json, path, value)}
+\end{itemize}
+

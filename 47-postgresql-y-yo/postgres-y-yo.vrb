@@ -1,0 +1,18 @@
+\frametitle{Appendix: Implementation}
+
+  \begin{itemize}
+    \item Set-returning function \texttt{pg\_stat\_get\_progress\_info(text)}
+    \item Returns raw metrics
+    \item View definitions (\texttt{pg\_stat\_progress\_vacuum} etc) transform metrics
+      into user-readable parameters
+    \item PostgreSQL C code injects metrics into \texttt{pgstat} system
+  \end{itemize}
+\vfill
+\begin{verbatim}
+pgstat_progress_start_command(command type);
+pgstat_progress_update_param(4, 158);
+pgstat_progress_update_param(PROGRESS_ANALYZE_PHASE,
+                             PROGRESS_ANALYZE_PHASE_SCAN_TABLE);
+pgstat_progress_end_command();
+  \end{verbatim}
+

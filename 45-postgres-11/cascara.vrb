@@ -1,0 +1,7 @@
+\frametitle{Configuración por omisión}
+
+\begin{lstlisting}
+jit_above_cost = 100000
+jit_inline_above_cost = 500000
+jit_optimize_above_cost = 500000
+\end{lstlisting}

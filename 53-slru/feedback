@@ -1,0 +1,53 @@
+- intro slide
+- 
+- is there a blog post on this?
+
+https://docs.google.com/document/d/1r5o0rB3HwGv1F-Z7U_cN_jtZK_QFGQ0BLL3hSYpP-ho/edit?tab=t.0
+
+Floor
+Naming, would someone pronounce it as ‘slruh’ haha?
+
+Put the 4 billion fun fact on a slide? That’s fun! (or: not fun)
+
+You never introduced yourself? Don’t rely on a room host to do that, they might
+not. Makes sure you have a slide so people know how to get in touch with you
+(that can be your last slide too, but still, a little background about who you
+are and why you are giving this presentation, is good).
+
+“someday we might want to change that” - I love these insights and screenshots
+
+Could it be a fun idea to add pictures of people to their comments? (with their
+permission ofcourse). Or a Boriss-style drawing if you know what I mean?
+
+Pg_stat_slru naming is hard, part 2. 
+
+On the “The new GuCs” slide 1mb? 1gb?
+
+Ed
+Might be good to outline the talk structure at the beginning.
+Because it seems like the first 25 mins of the talk is the history of Postgres
+development. I guess this does outline just how SLRU evolved. 
+
+But for current Postgres devs maybe having a summary of what SLRU is, what it
+does now and its current features first would be good. 
+
+Then the full history showing how did we get here.  Starting with a timeline of
+the historical features you then go through.
+
+Second part of talk. Could perhaps do with a clearer dividing slide. I think it
+starts with the list of the 8? SLRUs which could perhaps also benefit with a
+revisit of what each does?
+
+Then go into issues with current  multiXact SLRU and its bigger buffers
+solution.
+
+Laura
+I can’t provide technical feedback. We love to hear Alvaro presenting!
+Maybe he could put a bit more of “acting” while telling the story :) 
+Graphs are a great support in this presentation! I’d like to see some more!
+
+
+Peter
+Great presentation. Maybe add a "Summary" slide before the last (contact) page, with a call to action to upgrade to PG17 and some guidance on what to set, or in what situations people should upgrade.
+
+

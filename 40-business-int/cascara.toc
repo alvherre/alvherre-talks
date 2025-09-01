@@ -1,0 +1,5 @@
+\beamer@endinputifotherversion {3.33pt}
+\select@language {spanish}
+\beamer@sectionintoc {1}{Cuarentena y Carga de datos}{9}{0}{1}
+\beamer@sectionintoc {2}{Almacenes de datos}{13}{0}{2}
+\beamer@sectionintoc {3}{Ejecuci\IeC {\'o}n de consultas}{20}{0}{3}

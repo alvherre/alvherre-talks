@@ -1,0 +1,19 @@
+\BOOKMARK [2][]{Outline0.1}{History Review}{}% 1
+\BOOKMARK [3][]{Outline0.1.1.2}{Prehistory}{Outline0.1}% 2
+\BOOKMARK [3][]{Outline0.1.2.5}{Declarative}{Outline0.1}% 3
+\BOOKMARK [3][]{Outline0.1.3.7}{Limitations}{Outline0.1}% 4
+\BOOKMARK [3][]{Outline0.1.4.8}{Versioning}{Outline0.1}% 5
+\BOOKMARK [2][]{Outline0.2}{New features}{}% 6
+\BOOKMARK [3][]{Outline0.2.1.11}{DEFAULT partition}{Outline0.2}% 7
+\BOOKMARK [3][]{Outline0.2.2.13}{row migration}{Outline0.2}% 8
+\BOOKMARK [3][]{Outline0.2.3.15}{Hash partitioning}{Outline0.2}% 9
+\BOOKMARK [3][]{Outline0.2.4.18}{ON CONFLICT}{Outline0.2}% 10
+\BOOKMARK [2][]{Outline0.3}{Better DDL}{}% 11
+\BOOKMARK [3][]{Outline0.3.1.20}{CREATE INDEX}{Outline0.3}% 12
+\BOOKMARK [3][]{Outline0.3.2.23}{UNIQUE / PKs}{Outline0.3}% 13
+\BOOKMARK [3][]{Outline0.3.3.25}{Foreign Keys}{Outline0.3}% 14
+\BOOKMARK [3][]{Outline0.3.4.26}{Triggers}{Outline0.3}% 15
+\BOOKMARK [2][]{Outline0.4}{Better Performance}{}% 16
+\BOOKMARK [3][]{Outline0.4.1.27}{Faster pruning}{Outline0.4}% 17
+\BOOKMARK [3][]{Outline0.4.2.30}{Runtime pruning}{Outline0.4}% 18
+\BOOKMARK [3][]{Outline0.4.3.33}{Partitionwise joins}{Outline0.4}% 19

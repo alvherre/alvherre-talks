@@ -1,0 +1,579 @@
+\section{History Review}
+\subsection{Prehistory}
+\begin{frame}
+  \frametitle{Before Declarative Partitioning}
+  \begin{itemize}
+    \item Early ``partitioning'' introduced in PostgreSQL 8.1 (2005)
+    \item Heavily based on relation inheritance (from OOP)
+    \item Novelty was ``constraint exclusion''
+      \begin{itemize}
+	\item a sort of ``theorem prover'' using queries and constraints
+      \end{itemize}
+    \item Huge advance at the time
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Example DDL}
+
+\footnotesize
+\begin{lstlisting}
+  CREATE TABLE measurement (
+      city_id int not null, logdate date not null,
+      peaktemp int, unitsales int);
+
+  CREATE TABLE measurement_y2006m02 (
+    CHECK ( logdate >= DATE '2006-02-01' AND
+             logdate < DATE '2006-03-01' )
+  ) INHERITS (measurement);
+
+  CREATE TABLE measurement_y2006m03 (
+    CHECK ( logdate >= DATE '2006-03-01' AND
+             logdate < DATE '2006-04-01' )
+  ) INHERITS (measurement);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Example DDL (2)}
+
+\footnotesize
+\begin{lstlisting}
+CREATE OR REPLACE FUNCTION measurement_insert_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF ( NEW.logdate >= DATE '2006-02-01' AND
+         NEW.logdate < DATE '2006-03-01' ) THEN
+        INSERT INTO measurement_y2006m02 VALUES (NEW.*);
+    ELSIF ( NEW.logdate >= DATE '2006-03-01' AND
+            NEW.logdate < DATE '2006-04-01' ) THEN
+        INSERT INTO measurement_y2006m03 VALUES (NEW.*);
+    ELSIF ( ... )
+	...
+    ELSE
+        INSERT INTO measurement_default VALUES (NEW.*);
+    END IF;
+    RETURN NULL;
+END;
+$$;
+
+\end{lstlisting}
+\end{frame}
+
+\subsection{Declarative}
+\begin{frame}
+  \frametitle{Declarative Partitioning}
+
+  \begin{itemize}
+    \item Introduced in PostgreSQL 10
+    \item Easier to manage
+    \item Better tuple routing performance
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Declarative Partitioning DDL (Postgres 10)}
+
+  \lstset{language=SQL}
+  \begin{lstlisting}
+CREATE TABLE orders (
+   order_id BIGINT, order_date TIMESTAMP WITH TIME ZONE, ...
+) PARTITION BY RANGE (order_date);
+
+CREATE TABLE orders_2018_08    -- create empty partition
+  PARTITION OF clientes FOR VALUES
+  FROM ('2018-08-01') TO ('2018-08-31');
+
+-- pre-filled table attached after the fact
+ALTER TABLE orders
+  ATTACH PARTITION orders_2018_01
+  FOR VALUES FROM ('2018-01-01') TO ('2018-01-31');
+
+-- No code needed for tuple routing!!
+  \end{lstlisting}
+
+\end{frame}
+
+\subsection{Limitations}
+\begin{frame}
+  \frametitle{Decl. Partitioning: limitations}
+
+  \begin{itemize}
+    \item Only \texttt{LIST} and \texttt{RANGE}
+    \item No default partition
+    \item Still using constraint exclusion
+    \item Most DDL must be applied per partition
+      \begin{itemize}
+	\item indexes, triggers
+	\item constraints (incl. foreign keys)
+      \end{itemize}
+    \item some features don't work
+      \begin{itemize}
+	\item ON CONFLICT DO UPDATE
+	\item UPDATE across partitions
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\subsection{Versioning}
+\begin{frame}
+  \frametitle{Prelude to PostgreSQL 11}
+
+  \begin{itemize}
+    \item Diversion: Change in version numbering
+    \item Everybody now must know that versioning changed
+    \item Must attend conferences every year!!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partitioning in PostgreSQL 11}
+
+  \begin{itemize}
+    \item New partitioning features
+    \item Better support for DDL commands
+    \item Performance optimizations
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{New Partitioning Features}
+
+  \begin{itemize}
+    \item \texttt{DEFAULT} partition
+    \item Row migration on \texttt{UPDATE}
+    \item Hash partitioning
+    \item \texttt{INSERT ON CONFLICT DO UPDATE}
+  \end{itemize}
+\end{frame}
+
+\section{New features}
+\subsection{DEFAULT partition}
+
+\begin{frame}[fragile]
+  \frametitle{New feature: DEFAULT partition}
+
+\begin{lstlisting}
+CREATE TABLE orders_def
+  PARTITION OF orders
+  FOR VALUES DEFAULT;
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Receives tuples for which there is no other partition
+    \item Range partitioning: The default partition receives NULLs
+    \item<2-> Please test!
+  \end{itemize}
+\end{frame}
+
+  \subsection{row migration}
+\begin{frame}[fragile]
+  \frametitle{New feature: Row migration on UPDATE}
+
+  \begin{lstlisting}
+UPDATE orders SET order_date = '2018-08-02'
+  WHERE order_date = '2018-07-31';
+  \end{lstlisting}
+
+  \begin{itemize}
+    \item Ability to move rows from one partition to another
+    \item Hopefully not typical usage
+    \item May have funny corner cases under concurrency
+    \item<2-> Please test!
+  \end{itemize}
+\end{frame}
+
+\subsection{Hash partitioning}
+\begin{frame}[fragile]
+  \frametitle{New feature: hash partitioning}
+
+
+  \begin{lstlisting}
+CREATE TABLE clientes (
+  cliente_id INTEGER, ...
+) PARTITION BY HASH (cliente_id);
+
+CREATE TABLE clientes_0 PARTITION OF clientes
+  FOR VALUES WITH (MODULUS 3, REMAINDER 0);
+CREATE TABLE clientes_1 PARTITION OF clientes
+  FOR VALUES WITH (MODULUS 3, REMAINDER 1);
+CREATE TABLE clientes_2 PARTITION OF clientes
+  FOR VALUES WITH (MODULUS 6, REMAINDER 2);
+CREATE TABLE clientes_2 PARTITION OF clientes
+  FOR VALUES WITH (MODULUS 6, REMAINDER 5);
+CREATE TABLE clientes_2 PARTITION OF clientes
+
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{New subfeature: Re-hashing (2)}
+
+\footnotesize
+  \begin{lstlisting}
+CREATE TABLE clientes_00 (LIKE clientes);
+CREATE TABLE clientes_01 (LIKE clientes);
+
+WITH moved AS (
+  DELETE FROM clientes_0
+    WHERE satisfies_hash_partition('clientes'::regclass, 6, 0,
+                                      cliente_id)
+    RETURNING *)
+INSERT INTO clientes_00 SELECT * FROM moved;
+
+WITH moved AS (
+  DELETE FROM clientes_0
+    WHERE satisfies_hash_partition('clientes'::regclass, 6, 3,
+                                      cliente_id)
+    RETURNING *)
+INSERT INTO clientes_01 SELECT * FROM moved;
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{New subfeature: Re-hashing (2)}
+
+  \begin{lstlisting}
+ALTER TABLE clientes DETACH PARTITION clientes_0;
+ALTER TABLE clientes ATTACH PARTITION clientes_00
+  FOR VALUES WITH (MODULUS 6, REMAINDER 0);
+ALTER TABLE clientes ATTACH PARTITION clientes_01
+  FOR VALUES WITH (MODULUS 6, REMAINDER 3);
+  \end{lstlisting}
+\end{frame}
+
+\subsection{ON CONFLICT}
+\begin{frame}[fragile]
+  \frametitle{New feature: ON CONFLICT DO UPDATE}
+
+\begin{lstlisting}
+CREATE TABLE order_items (
+  order_id INTEGER NOT NULL,
+  item_id INTEGER NOT NULL,
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+  UNIQUE (order_id, item_id)
+) PARTITION BY HASH (order_id);
+-- create partitions
+
+INSERT INTO order_items VALUES (888, 12345, 5)
+  ON CONFLICT (order_id, item_id) DO UPDATE
+  SET quantity = order_items.quantity + EXCLUDED.quantity;
+\end{lstlisting}
+
+\end{frame}
+
+\section{Better DDL}
+
+\begin{frame}
+  \frametitle{Better DDL support}
+
+  \begin{itemize}
+    \item CREATE INDEX
+    \item UNIQUE \& PRIMARY KEY constraints
+    \item FOREIGN KEY constraints
+    \item Row-level triggers
+  \end{itemize}
+\end{frame}
+
+\subsection{CREATE INDEX}
+\begin{frame}
+  \frametitle{Better DDL: CREATE INDEX}
+
+  \begin{itemize}
+    \item \texttt{CREATE INDEX} applies to parent table
+    \item Cascades to each partition
+      \begin{itemize}
+	\item If identical index already exists, it is attached
+	\item If not, a new index is created
+      \end{itemize}
+    \item Clones the index when new partitions are added
+      \begin{itemize}
+	\item or attaches an existing index
+      \end{itemize}
+      \pause
+    \item Index can be created ON ONLY parent table
+      \begin{itemize}
+	\item No cascading occurs
+	\item Partition indexes can be attached later
+	  \begin{itemize}
+	    \item \texttt{ALTER INDEX ATTACH PARTITION}
+	  \end{itemize}
+        \item Once all partition indexes are attached, parent index becomes valid
+	  \pause
+	\item This is what \texttt{pg\_dump} does 
+      \end{itemize}
+  \end{itemize}
+  % XXX show sample DDL
+\end{frame}
+
+\subsection{UNIQUE / PKs}
+\begin{frame}
+  \frametitle{Better DDL: UNIQUE constraints}
+
+  \begin{itemize}
+    \item UNIQUE constraints are just indexes that are UNIQUE
+    \item ... well, add a \texttt{pg\_constraint} row
+      \begin{itemize}
+	\item So we clone that too
+      \end{itemize}
+    \item<2-> Limitation: all columns in partition key must appear in constraint
+    \item<2-> Local unicity ensures global unicity
+    \item<2-> To do better requires global indexes or other tricks
+  \end{itemize}
+\end{frame}
+
+\subsection{Foreign Keys}
+\begin{frame}
+  \frametitle{Better DDL: FOREIGN KEY constraints}
+  \begin{itemize}
+    \item FKs in partitioned tables referencing non-partitioned tables
+    \item Doing the other way around requires more effort \texttt{:-(}
+    \item New partitions clone the constraints/trigger
+    \item User doesn't need to do anything
+  \end{itemize}
+
+\end{frame}
+
+\subsection{Triggers}
+\begin{frame}
+  \frametitle{Better DDL: Row-level triggers}
+
+  \begin{itemize}
+    \item \texttt{AFTER} triggers \texttt{FOR EACH ROW} on partitioned table
+    \item Cloned to each partition on creation
+  \end{itemize}
+\end{frame}
+
+\section{Better Performance}
+
+\subsection{Faster pruning}
+\begin{frame}
+  \frametitle{Performance: Faster pruning}
+
+  \begin{itemize}
+    \item Constraint exclusion is slow and limited
+    \item Partition pruning is completely new, more advanced tech
+    \item It produces a ``pruning program`` from query WHERE clause and partition bounds
+    \item Initially, pruning applies at plan time
+      \begin{itemize}
+	\item just like constraint exclusion
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Pruning example}
+\footnotesize
+\begin{lstlisting}
+EXPLAIN (ANALYZE, COSTS off)
+   SELECT * FROM clientes
+   WHERE cliente_id = 1234;
+                               QUERY PLAN                               
+----------------------------------------------------------------------
+ Append (actual time=0.054..2.787 rows=1 loops=1)
+   ->  Seq Scan on clientes_2 (actual time=0.052..2.785 rows=1 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12570
+ Planning Time: 0.292 ms
+ Execution Time: 2.822 ms
+(6 filas)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{No pruning example}
+\footnotesize
+\begin{lstlisting}
+SET enable_partition_pruning TO off;
+EXPLAIN (ANALYZE, COSTS off)
+   SELECT * FROM clientes
+   WHERE cliente_id = 1234;
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Append (actual time=6.658..10.549 rows=1 loops=1)
+   ->  Seq Scan on clientes_1 (actual time=4.724..4.724 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 24978
+   ->  Seq Scan on clientes_00 (actual time=1.914..1.914 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12644
+   ->  Seq Scan on clientes_2 (actual time=0.017..1.021 rows=1 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12570
+   ->  Seq Scan on clientes_3 (actual time=0.746..0.746 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12448
+   ->  Seq Scan on clientes_01 (actual time=0.648..0.648 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12482
+   ->  Seq Scan on clientes_4 (actual time=0.774..0.774 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12400
+   ->  Seq Scan on clientes_5 (actual time=0.717..0.717 rows=0 loops=1)
+         Filter: (cliente_id = 1234)
+         Rows Removed by Filter: 12477
+ Planning Time: 0.375 ms
+ Execution Time: 10.603 ms
+(24 filas)
+
+\end{lstlisting}
+\end{frame}
+
+\subsection{Runtime pruning}
+\begin{frame}
+  \frametitle{Performance: Runtime pruning}
+
+  \begin{itemize}
+    \item Partition pruning can be applied at execution time too
+    \item Many queries can be optimized better at ``run'' time
+    \item Two chances for runtime pruning
+      \begin{itemize}
+	\item When bound parameters are given values (bind time)
+	\item Values obtained from other execution nodes
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Runtime pruning example}
+\footnotesize
+\begin{lstlisting}
+explain (analyze, costs off, summary off, timing off)
+   execute ab_q1 (2, 2, 3);
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Append (actual rows=0 loops=1)
+   Subplans Removed: 6
+   ->  Seq Scan on ab_a2_b1 (actual rows=0 loops=1)
+         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+   ->  Seq Scan on ab_a2_b2 (actual rows=0 loops=1)
+         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+   ->  Seq Scan on ab_a2_b3 (actual rows=0 loops=1)
+         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+(8 rows)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Another runtime pruning example}
+\footnotesize
+\begin{lstlisting}
+explain (analyze, costs off, summary off, timing off)
+select * from tbl1 join tprt on tbl1.col1 < tprt.col1;
+                                QUERY PLAN                                
+--------------------------------------------------------------------------
+ Nested Loop (actual rows=1 loops=1)
+   ->  Seq Scan on tbl1 (actual rows=1 loops=1)
+   ->  Append (actual rows=1 loops=1)
+         ->  Index Scan using tprt1_idx on tprt_1 (never executed)
+               Index Cond: (tbl1.col1 < col1)
+         ->  Index Scan using tprt2_idx on tprt_2 (never executed)
+               Index Cond: (tbl1.col1 < col1)
+         ->  Index Scan using tprt5_idx on tprt_5 (never executed)
+               Index Cond: (tbl1.col1 < col1)
+         ->  Index Scan using tprt6_idx on tprt_6 (actual rows=1 loops=1)
+               Index Cond: (tbl1.col1 < col1)
+(15 rows)
+\end{lstlisting}
+
+\end{frame}
+
+\subsection{Partitionwise joins}
+\begin{frame}
+  \frametitle{Performance: Partitionwise joins}
+
+  \begin{itemize}
+    \item Applies to joins between partitioned tables
+    \item Normal case: join produces cartesian product of partitions
+    \item Partitionwise join: join occurs ``per partition''
+      \begin{itemize}
+    	\item If partition bounds are identical
+	\item only joins those partitions with matching bounds
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Partitionwise join example}
+
+  \footnotesize
+  \begin{lstlisting}
+CREATE TABLE orders (order_id int, client_id int)
+  PARTITION BY RANGE (order_id);
+CREATE TABLE orders_1000 PARTITION OF orders
+  for values FROM (1) TO (1000);
+CREATE TABLE orders_2000 PARTITION OF orders
+  FOR VALUES FROM (1000) TO (2000);
+
+CREATE TABLE order_items (order_id int, item_id int)
+  PARTITION BY RANGE (order_id);
+CREATE TABLE order_items_1000 PARTITION OF order_items
+  for VALUES FROM (1) TO (1000);
+CREATE TABLE order_items_2000 PARTITION OF order_items
+  FOR VALUES FROM (1000) TO (2000);
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Partitionwise join example}
+
+\footnotesize
+  \begin{lstlisting}
+SET enable_partitionwise_join TO off;
+EXPLAIN (COSTS OFF) SELECT * FROM orders JOIN order_items
+USING (order_id) WHERE customer_id = 64;
+                                QUERY PLAN                                
+-----------------------------------------------------------------------
+ Hash Join
+   Hash Cond: (order_items_1000.order_id = orders_1000.order_id)
+   ->  Append
+         ->  Seq Scan on order_items_1000
+         ->  Seq Scan on order_items_2000
+   ->  Hash
+         ->  Append
+               ->  Bitmap Heap Scan on orders_1000
+                     Recheck Cond: (customer_id = 64)
+                     ->  Bitmap Index Scan on orders_1000_customer_id_idx
+                           Index Cond: (customer_id = 64)
+               ->  Seq Scan on orders_2000
+                     Filter: (customer_id = 64)
+(13 filas)
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Partitionwise join example}
+
+\footnotesize
+  \begin{lstlisting}
+EXPLAIN (COSTS OFF) SELECT * FROM orders JOIN order_items
+USING (order_id) WHERE customer_id = 64;
+                                   QUERY PLAN                       
+---------------------------------------------------------------------
+ Append
+   ->  Hash Join
+         Hash Cond: (order_items_1000.order_id = orders_1000.order_id)
+         ->  Seq Scan on order_items_1000
+         ->  Hash
+               ->  Bitmap Heap Scan on orders_1000
+                     Recheck Cond: (customer_id = 64)
+                     ->  Bitmap Index Scan on orders_1000_customer_id_idx
+                           Index Cond: (customer_id = 64)
+   ->  Nested Loop
+         ->  Seq Scan on orders_2000
+               Filter: (customer_id = 64)
+         ->  Index Scan using order_items_2000_order_id_idx on order_items_2000
+               Index Cond: (order_id = orders_2000.order_id)
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Thanks!}
+
+  Questions?
+
+\end{frame}

@@ -1,0 +1,68 @@
+\documentclass[professionalfonts]{beamer}
+%\documentclass[professionalfonts]{beamer}
+
+% \setbeameroption{show notes}
+
+%\usepackage{beamerthemesplit}
+%\usetheme[hideothersubsections]{Berkeley}
+\usetheme{Frankfurt}
+%\usecolortheme{sidebartab}
+\usecolortheme[RGB={40,106,175}]{structure} 
+\setbeamertemplate{items}[circle] 
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{textpos}
+\usepackage{hyperref}
+% \usepackage{enumitem}
+
+% Helvetica
+\usepackage{helvet}
+
+
+\beamertemplatenavigationsymbolsempty
+
+% \usepackage{pgfpages}
+% \pgfpagesuselayout{2 on 1}[letterpaper,border shrink=5mm]
+
+\title{Inteligencia de Negocios en PostgreSQL}
+
+\subtitle{\url{http://www.PostgreSQL.org/}}
+\vspace{0.5cm}
+\author{Álvaro Herrera \\ \href{mailto:alvherre@2ndQuadrant.com}{alvherre@2ndQuadrant.com}}
+\institute{2ndQuadrant Ltd. \\ \url{http://www.2ndQuadrant.com/}}
+\logo{\href{http://www.2ndquadrant.com/}{\includegraphics[height=1cm]{2ndQuadrant_150.jpg}}}
+
+\date{PGConf.EU 2014 \\
+\url{http://2014.pgconf.eu/} \\
+22 de octubre de 2014}
+
+% Advice from
+% http://petereisentraut.blogspot.ca/2009/09/how-to-make-latex-beamer-prettier.html
+\usepackage{textcomp,listings}
+
+\lstset{language=SQL,%
+basicstyle=\ttfamily, columns=fullflexible, upquote%
+%morekeywords={data,wrapper,library,language}%
+}
+
+\usepackage{tikz}
+
+% http://www.ling.ohio-state.edu/~jonsafari/latex/
+% \usepackage{cancel}
+\usepackage[normalem]{ulem}
+
+% http://tex.stackexchange.com/questions/3915/image-on-full-slide-in-beamer-package
+\newcommand<>{\fullsizegraphic}[1]{
+  \begin{textblock*}{0cm}(-1cm,-3.6cm)
+  \includegraphics[width=\paperwidth]{#1}
+  \end{textblock*}
+}
+
+\begin{document}
+\frame{ \titlepage }
+
+\include{pres}
+
+\end{document}

@@ -1,0 +1,82 @@
+\documentclass[ignorenonframetext,t]{beamer}
+\usetheme{2ndQuadrantTraining}
+
+\institute[UbuCon LA 2019]{PostgreSQL y yo}
+\date{Talca, Chile, agosto 22, 2019}
+
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+%BEGIN 2ndQuadrant
+% The following line has been commented since we use the Beamer style
+% to set the fonts.
+% \usepackage{lmodern}
+%END 2ndQuadrant
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fancyvrb}
+% \usepackage{fixltx2e} % provides \textsubscript
+\usepackage{anyfontsize}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight0.8\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+% http://tex.stackexchange.com/questions/3915/image-on-full-slide-in-beamer-package
+\usepackage{textpos}
+\newcommand<>{\fullsizegraphic}[1]{
+  \begin{textblock*}{0cm}(-1cm,-3.2cm)
+  \includegraphics[width=\paperwidth]{#1}
+  \end{textblock*}
+}
+
+% Comment these out if you don't want a slide with just the
+% part/section/subsection/subsubsection title:
+\AtBeginPart{
+  \let\insertpartnumber\relax
+  \let\partname\relax
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \let\insertsectionnumber\relax
+  \let\sectionname\relax
+  \frame{\sectionpage}
+}
+\AtBeginSubsection{
+  \let\insertsubsectionnumber\relax
+  \let\subsectionname\relax
+  \frame{\subsectionpage}
+}
+
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0.4ex}\setlength{\parskip}{0.6ex}}
+\setcounter{secnumdepth}{0}
+
+\include{pres}
+
+\end{document}

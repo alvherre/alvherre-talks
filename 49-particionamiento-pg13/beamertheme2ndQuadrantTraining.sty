@@ -1,0 +1,341 @@
+\usepackage{txfonts}
+\usepackage{etoolbox}
+\usepackage{pict2e}
+\usepackage{wasysym}
+\usepackage{multicol}
+% \usepackage{tikz}
+
+\setbeamersize{text margin left=10mm} % 5.7mm
+\setbeamersize{text margin right=10mm}
+
+%\pgfdeclareimage[height=3cm]{2ndq-symbol}{2ndQuadrantSymbol}
+%\pgfdeclareimage[height=5cm]{2ndq-banner}{2ndQuadrant}
+\pgfdeclareimage[width=9cm]{2ndq-logo}{2ndQ_logo_color}
+\pgfdeclareimage[width=20cm]{2ndq-banner}{2ndQ_logo_color}
+%\pgfdeclareimage[height=12cm]{postgis-logo}{PostGIS}
+
+%%
+%% Title page
+%%
+
+\newcommand{\auxf}{}
+\newcommand{\auxg}{}
+
+\newcommand{\ListSpacing}[1]{
+  \renewcommand{\tightlist}{%
+    \setlength{\itemsep}{0.4ex}\setlength{\parskip}{#1}}
+}
+
+\newlength{\textQuoteWidth}
+\setlength{\textQuoteWidth}{12cm}
+
+%% TODO: For completeness, specify adjusted font sizes for all the
+%% remaining entries below. For now we only provided \small and
+%% \normalsize because we didn't need the others (yet).
+
+\makeatletter
+%\renewcommand\tiny{\@setfontsize\tiny{5}{6}}
+\renewcommand\scriptsize{\@setfontsize\scriptsize{16}{19}}
+\renewcommand\footnotesize{\@setfontsize\footnotesize{22}{26}}
+\renewcommand\small{\@setfontsize\small{26}{29}}
+\renewcommand\normalsize{\@setfontsize\normalsize{32}{38}}
+\renewcommand\large{\@setfontsize\large{42}{48}}
+\renewcommand\Large{\@setfontsize\Large{52}{58}}
+%\renewcommand\LARGE{\@setfontsize\LARGE{14.4}{18}}
+%\renewcommand\huge{\@setfontsize\huge{20.74}{30}}
+%\renewcommand\Huge{\@setfontsize\Huge{24}{36}}
+\makeatother
+
+\usefonttheme{professionalfonts}
+\usefonttheme{serif}
+
+\setbeamerfont{title}{size*={54}{54},series=\bfseries}%,color=black}
+\setbeamercolor{title}{fg=black}
+
+\setbeamerfont{author}{size*={26}{28.8}}%,color=black}
+\setbeamerfont{date}{size*={14}{16},family=\rmfamily}%,color=black}
+
+\setbeamertemplate{title page}{
+  \setlength{\unitlength}{1mm}
+  \begin{picture}(250,180)(0,12)
+    % 2ndQuadrant logo
+    % 4:3
+    %\put(20,80){\pgfuseimage{2ndq-banner}}
+    % 19:6
+    \put(60,100){\pgfuseimage{2ndq-banner}}
+    % Collection
+    \putcollection
+    % Title graphic
+    %%\put(125,5){
+    %%  \inserttitlegraphic
+    %%}
+    % Slideset title
+    \put(-8,100){
+      \parbox[t][5cm]{35cm}{
+        \center%
+        \usebeamerfont{title}%
+        \inserttitle
+      }
+    }
+    % Date
+    \put(20,20){
+      \parbox[t][5cm]{16cm}{
+        \usebeamerfont{date}%
+        \insertcopyright
+      }
+    }
+    % Other
+    %%\ifdefined\customTitlePageContent{
+    %%  \customTitlePageContent
+    %%}\else\fi
+  \end{picture}
+}
+
+%%
+%% Frame title
+%%
+
+\setbeamertemplate{headline}{
+%  \vskip 16pt
+%  \hskip 22.3mm
+  \vskip -12mm
+% 4:3
+  %\hskip 204mm
+% 16:9
+  \hskip 295mm
+  \pgfuseimage{2ndq-logo}%
+  \vskip -15mm
+%  \hskip 26pt%
+%  \hfill\pgfuseimage{event-logo}\vskip -2cm
+}
+
+\setbeamercolor{frametitle}{fg=black}
+\setbeamerfont{frametitle}{size*={44}{44},series=\bfseries}
+\setbeamertemplate{frametitle}{
+  \vskip -40pt%
+  \hskip -25pt%
+  \parbox{295mm}{\raggedright\insertframetitle}%
+  \vskip 10pt%
+}
+
+%%
+%% Frame footer
+%%
+
+\newcommand{\quoteText}{\ }
+\newcommand{\quoteAuthor}{\ }
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{
+  \hbox{
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,left]{}
+	    \hspace{3em}   \insertshorttitle
+    \end{beamercolorbox}
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
+    \insertshortinstitute
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.3\paperwidth,ht=2.25ex,dp=1ex,right]{}%
+      \insertframenumber{} / \inserttotalframenumber\hspace*{3em}
+    \end{beamercolorbox}
+  }
+}
+\setbeamerfont{footline}{family=\rmfamily,size*={13}{13}}
+
+%%
+%% Frame contents
+%%
+
+%% Adjust itemize spacing
+\makeatletter
+\patchcmd{\@listI}{\itemsep3\p@}{\itemsep1.6ex}{}{}
+\patchcmd{\@listii}{\topsep2\p@}{\topsep0.4ex}{}{}
+%\patchcmd{\@listii}{\parsep0\p@}{\parsep1ex}{}{}
+%\patchcmd{\@listii}{\itemsep\parsep}{\itemsep0.8ex}{}{}
+\patchcmd{\@listiii}{\topsep2\p@}{\topsep0.4ex}{}{}
+\patchcmd{\@listiii}{\itemsep\parsep}{\itemsep0.4ex}{}{}
+\makeatother
+
+\setbeamerfont{section in toc}{size*={32}{36}}
+\setbeamerfont{subsection in toc}{size*={32}{36}}
+
+%\setbeamerfont{block body}{size*={32}{38.4}}
+
+%\setbeamerfont{item}{size*={32}{38.4}}
+\setbeamerfont{itemize/enumerate body}{size*={32}{38}}
+\setbeamerfont{itemize/enumerate subbody}{size*={28}{32}}
+\setbeamerfont{itemize/enumerate subsubbody}{size*={24}{28}}
+
+\setbeamerfont{highlighting}{size*={24}{28}}
+
+\setbeamercolor{item}{fg=black}
+
+\setbeamertemplate{itemize item}{%
+  \raisebox{4pt}
+  {%
+    \donotcoloroutermaths%
+    \fontsize{23}{23}%
+    \selectfont%
+    $\bullet$%
+    \hskip 2mm
+  }%
+}
+
+\setbeamertemplate{itemize subitem}{%
+  \raisebox{6pt}
+  {%
+    \donotcoloroutermaths%
+    \fontsize{20}{20}%
+    \selectfont%
+    $\bullet$%
+    \hskip 2mm
+  }%
+}
+
+\setbeamertemplate{itemize subsubitem}{%
+  \raisebox{6pt}
+  {%
+    \donotcoloroutermaths%
+    \fontsize{16}{16}%
+    \selectfont%
+    ---%
+    \hskip 2mm
+  }%
+}
+
+\setbeamertemplate{itemize/enumerate body begin}{
+  \setlength{\leftmargini}{0.5cm}
+  \setlength{\leftmarginii}{1.55cm}
+  \setlength{\leftmarginiii}{1.55cm}
+}
+
+%? \setbeamertemplate{itemize/enumerate body begin}{
+%?   \vskip 11.5mm
+%? }
+
+\setbeamertemplate{itemize/enumerate body end}{
+  \vskip 0cm
+}
+
+%?? %% List spacing
+%?? 
+%?? \newlength{\wideitemsep}
+%?? \setlength{\wideitemsep}{\itemsep}
+%?? \addtolength{\wideitemsep}{5pt}
+%?? \let\olditem\item
+%?? \renewcommand{\item}{\setlength{\itemsep}{\wideitemsep}\olditem}
+%?? 
+%?? \setlength{\leftmarginii}{1.25cm}
+%?? \setlength{\leftmarginiii}{1.25cm}
+
+\newcommand{\slideQuestions}{
+  \begin{frame}{}
+    \vskip 2em
+    \centering Questions?\par
+  \end{frame}
+}
+
+%FIXME?	%%
+%FIXME?	%% Hacks for Asciidoc + pandoc sources
+%FIXME?	%%
+%FIXME?	
+%FIXME?	% Setting maximum image dimensions, because they are lost in
+%FIXME?	% translating from docbook to beamer
+%FIXME?	\setkeys{Gin}{height=6cm,width=10cm,keepaspectratio}
+%FIXME?	
+%FIXME?	% Removing captions from images
+%FIXME?	\renewcommand{\caption}[1]{}
+
+%%
+%% Useful to place a picture on the right and a list on the left. It
+%% must be used first in the slide.
+%%
+
+\newcommand{\RightSidePicture}[2][14cm]{\vskip 1cm\hskip 12cm\includegraphics[height=#1]{#2}\vskip -#1\vskip -1cm}
+
+%%
+%% The following macro can be used to annotate the Markdown source
+%% with comments that won't be printed. We do this because Markdown
+%% doesn't have comments; however, Pandoc's variant of Markdown has
+%% the ability to automatically recognise and render LaTeX code.
+%%
+
+\newcommand{\Comment}[1]{}
+
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+%BEGIN 2ndQuadrant
+% The following line has been commented since we use the Beamer style
+% to set the fonts.
+% \usepackage{lmodern}
+%END 2ndQuadrant
+
+\usepackage{amssymb,amsmath}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{ifxetex,ifluatex}
+% \usepackage{fixltx2e} % provides \textsubscript
+\usepackage{anyfontsize}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight0.8\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+% Comment these out if you don't want a slide with just the
+% part/section/subsection/subsubsection title:
+\AtBeginPart{
+  \let\insertpartnumber\relax
+  \let\partname\relax
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \let\insertsectionnumber\relax
+  \let\sectionname\relax
+  \frame{\sectionpage}
+}
+\AtBeginSubsection{
+  \let\insertsubsectionnumber\relax
+  \let\subsectionname\relax
+  \frame{\subsectionpage}
+}
+
+\setbeamertemplate{section page}
+{
+	\begin{centering}
+		\begin{beamercolorbox}[sep=48pt,center]{part title}
+		\usebeamerfont{section title}\large\insertsection\par
+		\end{beamercolorbox}
+	\end{centering}
+}
+
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0.4ex}\setlength{\parskip}{0.6ex}}
+\setcounter{secnumdepth}{0}
+

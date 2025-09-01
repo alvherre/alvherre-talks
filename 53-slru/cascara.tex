@@ -1,0 +1,160 @@
+% Class option 't' makes elements preserve position when \only<n> is used
+\documentclass[ignorenonframetext,t]{beamer}
+      
+% 2,4-10,14,17-44
+% These geometries are all FHD (1920x1080), but they result in different
+% font sizes.  Watch the titlepage!
+%\geometry{papersize={19.2cm,10.80cm}}
+%\geometry{papersize={11.52cm,6.48cm}}  % as above, but 3/5  (0.6)
+\geometry{papersize={12.8cm,7.2cm}}	% as above, but 2/3  (0.66)
+%\geometry{papersize={14.4cm,8.1cm}}	% as above, but 3/4  (0.75)
+
+
+\setbeameroption{show notes}
+% \usepackage[overridenote]{pdfpc} % BEWARE: changes note contents interpretation
+
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[export]{adjustbox} % https://texblog.org/2014/02/20/figure-with-border-in-latex/
+\usepackage{ulem}
+
+\let\checkmark\undefined  % dingbat defines this, but it's already been defined previously. wtf.
+\usepackage{dingbat} % WARNING -- hacked up!
+
+\usepackage{textcomp}	% for \textrightarrow
+
+\usepackage{pgfpages}
+%\setbeameroption{show notes}
+%\setbeameroption{show notes on second screen=right}
+
+% 19.5x9 is alvherre's current phone aspect ratio
+%\geometry{papersize={19.5cm,9cm}}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+\usetheme{Frankfurt}
+\setbeamertemplate{items}[circle] 
+\beamertemplatenavigationsymbolsempty
+
+% Minimal changes to color palette, using EDB colors
+\definecolor{bluecoal}{RGB}{40, 73, 90}
+\definecolor{goldleaf}{RGB}{231,197,104}
+\setbeamercolor{structure}{fg=bluecoal}
+\setbeamercolor{palette primary}{fg=goldleaf}
+
+% https://tex.stackexchange.com/questions/673635/beamer-section-title-slides
+\setbeamertemplate{section page}
+{
+  \begingroup
+    \centering
+%    {\usebeamerfont{section name}\usebeamercolor[fg]{section name}\sectionname~\insertsectionnumber}
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=12pt,center,rounded=true]{section title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \endgroup
+}
+
+
+% Definitions for title page
+% Maybe define graphic sizes in terms of pagesize fractions?
+\title{What is an SLRU anyway?}
+
+\author{\vspace*{-0.2cm} Álvaro Herrera -- Postgres developer, EDB}
+\newcommand{\sizeforlogos}{0.2}
+% \institute{\vspace*{-0.2cm}\href{https://www.enterprisedb.com/}{\includegraphics[height=\sizeforlogos\paperheight]{edb_portrait_color_grey.png}} \hspace{1cm} \href{https://p2d2.cz/2025/}{\includegraphics[height=\sizeforlogos\paperheight]{p2d2_logo_1.png}}}
+\institute{\vspace*{-0.2cm}\href{https://www.enterprisedb.com/}{\includegraphics[height=\sizeforlogos\paperheight]{edb_portrait_color_grey.png}} \hspace{1cm} \href{https://2025.pgconf.de/}{\includegraphics[height=\sizeforlogos\paperheight]{logo_pgconf_de.jpg}}}
+\date{Postgres Conference Germany 2025 \\
+Berlin \\
+8-9 May 2025}
+
+%\href{https://p2d2.cz/2025/}{\includegraphics[width=2cm]{p2d2_logo_1.png}} \\
+
+
+% Footer for all slides
+\setbeamertemplate{footline}{%
+  \hspace{0.3cm}%
+  \href{https://www.enterprisedb.com/}{\includegraphics[height=.4cm]{edb_landscape_color_grey.png}}%
+  \hfill%
+  \href{https://2025.pgconf.de/}{\includegraphics[height=20px]{logo_pgconf_de.jpg}}\hspace{0.3cm}%
+  \vspace{0.2cm}%
+  }
+
+%https://tex.stackexchange.com/questions/119277/non-bitmapped-thumb-up-symbol-for-flagging-good-practice-tips
+\usepackage{fontawesome}
+
+\usepackage{pmboxdraw}
+
+
+% https://tex.stackexchange.com/questions/58922/beamer-using-pause-within-lstlisting
+\usepackage{listings}
+\lstset{language=SQL,
+basicstyle=\footnotesize\ttfamily,keywordstyle=\bfseries\color{green!40!black},%
+columns=fullflexible, keepspaces, upquote,
+escapeinside={\%*}{*)},
+morekeywords={with, merge, returning},
+deletekeywords={YEAR},
+showspaces=false,showstringspaces=false,
+literate={á}{{\'{a}}}{1}
+         {é}{{\'{e}}}{1}
+         {í}{{\'{i}}}{1}
+         {ó}{{\'{o}}}{1}
+         {ú}{{\'{u}}}{1}
+         {ñ}{{\~{n}}}{1}
+	 {°}{\textdegree}{1}
+         {¡}{{!`}}{1}
+         {┌}{{\textSFi}}1 
+         {─}{{\textSFx}}1 
+         {│}{{\pmboxdrawuni{2502}}}1
+         {┬}{{\textSFvi}}1
+         {┐}{{\textSFiii}}1
+         {├}{{\textSFviii}}1
+         {┼}{{\textSFv}}1
+         {┤}{{\textSFix}}1
+         {┴}{{\textSFvii}}1
+         {└}{{\textSFii}}1
+         {┘}{{\textSFiv}}1
+	 {↵}{{\carriagereturn}}1
+%morekeywords={data,wrapper,library,language}%
+}
+
+%\newcommand{\putcollection}{
+%  \put(0,50){
+%    \parbox{\textwidth}{
+%      \fontsize{30}{30}\selectfont
+%      Álvaro Herrera \\
+%      PostgreSQL developer \\
+%      EDB
+%    }
+%  }
+%}
+%\newcommand{\insertcopyright}{}
+%\renewcommand{\insertcopyright}{\includegraphics[height=10px]{topbarlogo-grey.png}\hspace{1cm}{}}
+%\date{}
+
+% Make pauses show greyed-out future text
+\setbeamercovered{transparent}
+
+\include{pres.tex}
+
+\begin{frame}
+  \frametitle{Thanks!}
+  \vfill
+  \center {
+    \LARGE Questions?
+    \vspace{1cm}
+  }
+
+  Álvaro Herrera, EDB \\
+  {\color{bluecoal}  \href{https://enterprisedb.com/}{EDB (geb. EnterpriseDB)}} \\
+   \vspace{0.6cm} 
+  \href{mailto:alvherre@kurilemu.de}{\texttt{alvherre@kurilemu.de}} \\
+  Mastodon: \href{https://lile.cl/@alvherre}{\texttt{https://lile.cl/@alvherre/}}
+
+  \vfill
+\end{frame}
+
+
+\end{document}
+
+% :vim:ts=4:sw=4

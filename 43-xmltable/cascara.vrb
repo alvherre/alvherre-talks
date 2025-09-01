@@ -1,0 +1,20 @@
+\frametitle{\texttt{XMLTABLE} y el resto del \texttt{FROM}}
+\lstset{language=SQL}
+\begin{lstlisting}
+  SELECT hotel, currency, sum(salary)
+    FROM hoteldata,
+XMLTABLE ('/hotels/hotel/personnel/person' PASSING hotels
+       COLUMNS hotel text     PATH '../../name' NOT NULL,
+                salary integer PATH 'salary' NOT NULL,
+                currency text  PATH 'salary/@currency'
+                             NOT NULL
+) GROUP BY hotel, currency;
+\end{lstlisting}
+\vspace{1cm}
+\begin{tabular}{l | l | r}
+\textit{hotel} & \textit{currency} & \textit{sum} \\
+\hline
+Valparaíso & CLP & 1200000 \\
+Valparaíso & EUR & 50000 \\
+La Mancha & PTA & 45000 \\
+\end{tabular}

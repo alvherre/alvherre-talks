@@ -1,0 +1,18 @@
+\frametitle{Rehashing: migración}
+	\scriptsize
+	\begin{lstlisting}
+CREATE TABLE clientes_00 (LIKE clientes);
+CREATE TABLE clientes_01 (LIKE clientes);
+
+WITH moved AS (
+  DELETE FROM clientes_0
+    WHERE satisfies_hash_partition('clientes'::regclass, 6, 0, cliente_id)
+    RETURNING *)
+INSERT INTO clientes_00 SELECT * FROM moved;
+
+WITH moved AS (
+  DELETE FROM clientes_0
+    WHERE satisfies_hash_partition('clientes'::regclass, 6, 3, cliente_id)
+    RETURNING *)
+INSERT INTO clientes_01 SELECT * FROM moved;
+	\end{lstlisting}

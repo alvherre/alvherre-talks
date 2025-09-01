@@ -1,0 +1,119 @@
+Optimized locks without selects
+4096, 8192
+Test time  3m23.966908136s
+2, 4
+Test time  14m47.568776898s
+4, 8
+Test time  4m37.127450753s
+8, 16
+Test time  2m2.55582747s
+16, 32
+Test time  1m49.608016495s
+32, 64
+Test time  1m45.409433578s
+64, 128
+Test time  1m46.199207721s
+128, 256
+Test time  1m51.961186321s
+4096, 8192
+Test time  3m29.198055447s
+
+Normal locks
+4096, 8192
+Test time  3m32.513735826s
+2, 4
+Test time  11m46.084365818s
+4, 8
+Test time  4m31.645534391s
+8, 16
+Test time  1m56.461069694s
+16, 32
+Test time  1m54.58835488s
+32, 64
+Test time  1m48.718217697s
+64, 128
+Test time  1m48.031596712s
+128, 256
+Test time  1m58.651780683s
+4096, 8192
+Test time  3m47.575217909s
+
+With selects Normal Locks
+
+4096, 8192
+Test time  3m24.213090498s
+2, 4
+Test time  11m19.383079715s
+4, 8
+Test time  4m12.874619389s
+8, 16
+Test time  1m54.762329923s
+16, 32
+Test time  1m41.567222803s
+32, 64
+Test time  1m46.688873808s
+64, 128
+Test time  1m44.568643362s
+128, 256
+Test time  1m52.590062526s
+4096, 8192
+Test time  3m47.229836571s
+
+With selects and optimized locks
+
+4096, 8192
+Test time  3m17.335424818s
+2, 4
+Test time  12m56.669422482s
+4, 8
+Test time  4m23.95639111s
+8, 16
+Test time  1m54.959960331s
+16, 32
+Test time  1m48.268912299s
+32, 64
+Test time  1m44.987208951s
+64, 128
+Test time  1m46.162335701s
+128, 256
+Test time  1m52.530464334s
+4096, 8192
+Test time  3m30.761242783s
+
+Cache tests. Optimized locks with selects.
+256
+Test time  1m35.457184607s
+16
+Test time  1m28.394767411s
+32
+Test time  1m35.090747731s
+64
+Test time  1m28.886590781s
+128
+Test time  1m31.027109636s
+256
+Test time  1m29.906566173s
+512
+Test time  1m38.345378769s
+1024
+Test time  2m10.311852458s
+
+With selects and optimized locks, cache patch present but 256
+4096, 8192
+Test time  2m51.827921969s
+2, 4
+Test time  10m19.906310865s
+4, 8
+Test time  3m26.976212903s
+8, 16
+Test time  1m33.726941849s
+16, 32
+Test time  1m20.925479842s
+32, 64
+Test time  1m21.960255061s
+64, 128
+Test time  1m26.011486891s
+128, 256
+Test time  1m24.043057832s
+4096, 8192
+Test time  2m56.454942239s

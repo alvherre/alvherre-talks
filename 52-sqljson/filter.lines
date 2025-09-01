@@ -1,0 +1,10 @@
+include table store
+include table staff
+include table city
+include table address
+include table country
+include table address_address_id_seq
+include table staff_staff_id_seq
+include table store_store_id_seq
+include table city_city_id_seq
+include table country_country_id_seq

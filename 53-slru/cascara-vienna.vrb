@@ -1,0 +1,10 @@
+\frametitle{Suggested Monitoring Query}
+
+  \begin{lstlisting}[frame=trBL,frameround=fttt]
+  SELECT name, blks_zeroed, blks_read,
+       blks_hit+blks_read AS blks_accessed,
+       CASE WHEN blks_hit+blks_read = 0 THEN 'NaN'
+       ELSE (blks_hit::numeric / (blks_hit+blks_read))
+            ::numeric(4,2) END AS hit_ratio
+    FROM pg_stat_slru;
+  \end{lstlisting}

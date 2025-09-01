@@ -1,0 +1,131 @@
+% Class option 't' makes elements preserve position when \only<n> is used
+\documentclass[ignorenonframetext,t]{beamer}
+      
+\setbeameroption{show notes}
+% \usepackage[overridenote]{pdfpc} % BEWARE: changes note contents interpretation
+
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[export]{adjustbox} % https://texblog.org/2014/02/20/figure-with-border-in-latex/
+\usepackage{ulem}
+
+\let\checkmark\undefined  % dingbat defines this, but it's already been defined previously. wtf.
+\usepackage{dingbat} % WARNING -- hacked up!
+
+
+\usepackage{pgfpages}
+%\setbeameroption{show notes}
+%\setbeameroption{show notes on second screen=right}
+
+% 19.5x9 is alvherre's current phone aspect ratio
+%\geometry{papersize={19.5cm,9cm}}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+\usetheme{Frankfurt}
+\setbeamertemplate{items}[circle] 
+\beamertemplatenavigationsymbolsempty
+
+% Minimal changes to color palette, using EDB colors
+\definecolor{bluecoal}{RGB}{40, 73, 90}
+\definecolor{goldleaf}{RGB}{231,197,104}
+\setbeamercolor{structure}{fg=bluecoal}
+\setbeamercolor{palette primary}{fg=goldleaf}
+
+% Definitions for title page
+\author{Álvaro Herrera\\
+PostgreSQL developer}
+\institute{\href{https://www.enterprisedb.com/}{\includegraphics[width=1.4cm]{edb_portrait_color_grey.png}}}
+\date{
+\href{https://2024.pgconf.dev/}{\includegraphics[width=2.4cm]{pgconfdev-logo.jpg}} \\
+Vancouver, Canada \\
+29th May 2024}
+\title{The road to SQL/JSON features}
+
+% Footer for all slides
+\setbeamertemplate{footline}{%
+  \hspace{0.3cm}%
+  \href{https://www.enterprisedb.com/}{\includegraphics[height=.4cm]{edb_landscape_color_grey.png}}%
+  \hfill%
+  \href{https://2024.pgconf.dev/}{\includegraphics[height=10px]{pgconfdev-secondary-logo.jpg}}\hspace{0.3cm}%
+  \vspace{0.2cm}%
+  }
+
+%https://tex.stackexchange.com/questions/119277/non-bitmapped-thumb-up-symbol-for-flagging-good-practice-tips
+\usepackage{fontawesome}
+
+\usepackage{pmboxdraw}
+
+
+% https://tex.stackexchange.com/questions/58922/beamer-using-pause-within-lstlisting
+\usepackage{listings}
+\lstset{language=SQL,
+basicstyle=\footnotesize\ttfamily,keywordstyle=\bfseries\color{green!40!black},%
+columns=fullflexible, keepspaces, upquote,
+escapeinside={\%*}{*)},
+morekeywords={with, merge, returning},
+deletekeywords={YEAR},
+showspaces=false,showstringspaces=false,
+literate={á}{{\'{a}}}{1}
+         {é}{{\'{e}}}{1}
+         {í}{{\'{i}}}{1}
+         {ó}{{\'{o}}}{1}
+         {ú}{{\'{u}}}{1}
+         {ñ}{{\~{n}}}{1}
+	 {°}{\textdegree}{1}
+         {¡}{{!`}}{1}
+         {┌}{{\textSFi}}1 
+         {─}{{\textSFx}}1 
+         {│}{{\pmboxdrawuni{2502}}}1
+         {┬}{{\textSFvi}}1
+         {┐}{{\textSFiii}}1
+         {├}{{\textSFviii}}1
+         {┼}{{\textSFv}}1
+         {┤}{{\textSFix}}1
+         {┴}{{\textSFvii}}1
+         {└}{{\textSFii}}1
+         {┘}{{\textSFiv}}1
+	 {↵}{{\carriagereturn}}1
+%morekeywords={data,wrapper,library,language}%
+}
+
+%\newcommand{\putcollection}{
+%  \put(0,50){
+%    \parbox{\textwidth}{
+%      \fontsize{30}{30}\selectfont
+%      Álvaro Herrera \\
+%      PostgreSQL developer \\
+%      EDB
+%    }
+%  }
+%}
+%\newcommand{\insertcopyright}{}
+%\renewcommand{\insertcopyright}{\includegraphics[height=10px]{topbarlogo-grey.png}\hspace{1cm}{}}
+%\date{}
+
+% Make pauses show greyed-out future text
+\setbeamercovered{transparent}
+
+\include{pres.tex}
+
+\begin{frame}
+  \frametitle{Thanks!}
+  \vfill
+  \center {
+    \LARGE Questions?
+    \vspace{1cm}
+  }
+
+  Álvaro Herrera, EDB \\
+	\href{mailto:alvherre@alvh.no-ip.org}{\texttt{alvherre@alvh.no-ip.org}} \\
+  \texttt{alvaro.herrera@enterprisedb.com} \\
+%  \href{https://alvherre.cl/}{\texttt{https://alvherre.cl/}} \\
+  Mastodon: \href{https://lile.cl/@alvherre}{\texttt{https://lile.cl/@alvherre/}}
+
+  \vfill
+\end{frame}
+
+
+\end{document}
+
+% :vim:ts=4:sw=4

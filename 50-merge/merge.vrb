@@ -1,0 +1,30 @@
+\frametitle{Transition table -- complete example}
+  \begin{lstlisting}[basicstyle=\tiny]
+CREATE FUNCTION wine_audit() RETURNS trigger LANGUAGE plpgsql AS $$
+  BEGIN
+    IF (TG_OP = 'DELETE') THEN
+      INSERT INTO wine_audit
+           SELECT 'D', now(), row_to_json(o), NULL FROM old_table o;
+    ELSIF (TG_OP = 'INSERT') THEN
+      INSERT INTO wine_audit
+           SELECT 'I', now(), NULL, row_to_json(n) FROM new_table n;
+    ELSIF (TG_OP = 'UPDATE') THEN
+      DECLARE
+        oldrec record;
+	newrec jsonb;
+	i      integer := 0;
+      BEGIN
+        FOR oldrec IN SELECT * FROM old_table LOOP
+          newrec := row_to_json(n) FROM new_table n OFFSET i LIMIT 1;
+          i := i + 1;
+          INSERT INTO wine_audit
+               SELECT 'U', now(), row_to_json(oldrec), newrec;
+        END LOOP;
+      END;
+
+    END IF;
+    RETURN NULL;
+  END;
+$$;
+
+  \end{lstlisting}

@@ -1,0 +1,231 @@
+\begin{frame}
+	\frametitle{¿Qué es \texttt{XMLTABLE}?}
+\vspace{-0.6cm}
+\begin{itemize}
+\item Funcionalidad definida por el estándar SQL
+\begin{itemize} \item ISO 9075-14 (SQL/XML) \end{itemize}
+\item ``Función de tabla''
+\item Convierte datos XML a forma de ``tabla relacional''
+\item<2-> Implementado en PostgreSQL 10 por Pavel Stěhule
+\end{itemize}
+\pause \raggedleft
+\includegraphics[scale=0.25]{pavel.png}
+
+\pause
+
+\footnotesize
+\raggedleft con fuerte ayuda de Álvaro Herrera
+{\color{blue}\url{https://blog.2ndquadrant.com/xmltable-intro/}}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Sinopsis de sintaxis}
+\vspace{-0.3cm}
+\begin{lstlisting}
+xmltable( [ XMLNAMESPACES(url_namespace
+                              AS nombre_namespace [, ...]), ]
+          expresion_de_fila
+              PASSING [BY REF] expresion_documento [BY REF]
+          COLUMNS nombre { tipo
+                           [ PATH expresion_de_columna ]
+                           [ DEFAULT expresion_default ]
+                           [ NOT NULL | NULL ]
+                         | FOR ORDINALITY }
+                   [, ...]
+          )
+\end{lstlisting}
+\footnotesize\color{blue}\url{https://www.postgresql.org/docs/devel/static/functions-xml.html}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{XML de ejemplo}
+\footnotesize
+\begin{lstlisting}
+CREATE TABLE hoteldata (hotels XML);
+\end{lstlisting}
+\lstset{language=XML}
+\begin{lstlisting}
+<hotels>
+ <hotel id="mancha">
+  <name>La Mancha</name>
+  <rooms>
+   <room id="201"><capacity>3</capacity>
+      <comment>Vista del canal</comment>
+   </room>
+   <room id="202"><capacity>5</capacity></room>
+  </rooms>
+  <personnel>
+   <person id="1025">
+    <name>Ferdinando Quijana</name><salary currency="PTA">45000</salary>
+   </person>
+  </personnel>
+ </hotel>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{XML de ejemplo (2)}
+\footnotesize
+\lstset{language=XML}
+\begin{lstlisting}
+<hotel id="valpo">
+ <name>Valparaiso</name>
+ <rooms>
+  <room id="201"><capacity>2</capacity>
+      <comment>Muy ruidosa</comment></room>
+  <room id="202"><capacity>2</capacity></room>
+ </rooms>
+ <personnel>
+  <person id="1026"><name>Katharina Wuntz</name>
+    <salary currency="EUR">50000</salary> </person>
+  <person id="1027"><name>Diego Velazquez</name>
+     <salary currency="CLP">1200000</salary> </person>
+ </personnel>
+</hotel>
+</hotels>
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Tabulizando el \texttt{XML}}
+\lstset{language=SQL}
+\begin{lstlisting}
+SELECT xmltable.*
+  FROM hoteldata,
+       XMLTABLE ('/hotels/hotel/rooms/room' PASSING hotels
+                 COLUMNS
+          id FOR ORDINALITY,
+          hotel_name text PATH '../../name' NOT NULL,
+          room_id int PATH '@id' NOT NULL,
+          capacity int,
+          comment text PATH 'comment'
+                       DEFAULT 'A regular room'
+                );
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+
+	\frametitle{El resultado}
+\footnotesize
+\begin{lstlisting}
+COLUMNS id FOR ORDINALITY,
+        hotel_name text PATH '../../name' NOT NULL,
+        room_id int PATH '@id' NOT NULL,
+        capacity int,
+        comment text PATH 'comment' DEFAULT 'Habitacion normal'
+\end{lstlisting}
+
+\lstset{language=XML}
+\begin{lstlisting}
+<room id="201"><capacity>3</capacity> <comment>Vista del canal</comment> </room>
+\end{lstlisting}
+
+\normalsize
+\vspace{1cm}
+\begin{tabular}{r | l | r | r | l}
+\textit{id} & \textit{hotel\_name} & \textit{room\_id} & \textit{capacity} & \textit{comment} \\
+\hline
+1 & La Mancha & 201 & 3 & Vista del canal \\
+2 & La Mancha & 202 & 5 & Habitacion normal \\
+3 & Valparaíso & 201 & 2 & Muy ruidosa \\
+4 & Valparaíso & 202 & 2 & Habitacion normal \\
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Namespaces en \texttt{XML}}
+	\footnotesize
+	\lstset{language=XML}
+	\begin{lstlisting}
+<h:html xmlns:xdc="http://www.xml.com/books"
+         xmlns:h="http://www.w3.org/HTML/1998/html4">
+
+ <h:head><h:title>Book Review</h:title></h:head>
+ <h:body>
+  <xdc:bookreview>
+   <xdc:title h:style="font-family: sans-serif;">
+     XML: A Primer</xdc:title>
+   <h:table>
+    <h:tr align="center">
+     <h:td>Author</h:td><h:td>Price</h:td>
+     <h:td>Pages</h:td><h:td>Date</h:td></h:tr>
+    <h:tr align="left">
+     <h:td><xdc:author>Simon St. Laurent</xdc:author></h:td>
+     <h:td><xdc:price>31.98</xdc:price></h:td>
+     <h:td><xdc:pages>352</xdc:pages></h:td>
+     <h:td><xdc:date>1998/01</xdc:date></h:td>
+    </h:tr>
+   </h:table>
+  </xdc:bookreview>
+ </h:body>
+</h:html>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\texttt{XMLNAMESPACES}}
+\begin{lstlisting}
+SELECT xmltable.* FROM bookrev,
+    XMLTABLE(XMLNAMESPACES (
+                  'http://www.xml.com/books' AS xdc,
+                  'http://www.w3.org/HTML/1998/html4' AS h),
+       'h:body/xdc:bookreview' PASSING doc
+    COLUMNS title text PATH 'xdc:title',
+	    author text PATH 'h:table/h:tr/h:td/xdc:author' );
+\end{lstlisting}
+\pause
+\begin{tabular}{l | l}
+\textit{title} & \textit{author} \\
+\hline
+\\     XML: A Primer & Simon St. Laurent \\
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{\texttt{XMLTABLE} y el resto del \texttt{FROM}}
+\lstset{language=SQL}
+\begin{lstlisting}
+  SELECT hotel, currency, sum(salary)
+    FROM hoteldata,
+XMLTABLE ('/hotels/hotel/personnel/person' PASSING hotels
+       COLUMNS hotel text     PATH '../../name' NOT NULL,
+                salary integer PATH 'salary' NOT NULL,
+                currency text  PATH 'salary/@currency'
+                             NOT NULL
+) GROUP BY hotel, currency;
+\end{lstlisting}
+\vspace{1cm}
+\begin{tabular}{l | l | r}
+\textit{hotel} & \textit{currency} & \textit{sum} \\
+\hline
+Valparaíso & CLP & 1200000 \\
+Valparaíso & EUR & 50000 \\
+La Mancha & PTA & 45000 \\
+\end{tabular}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Desarrollo futuro}
+
+		\raggedleft \includegraphics<2>[scale=0.5]{korotkov.jpg}
+	\begin{center}
+		{\only <1>{El futuro: ¿qué viene después?}}
+	\pause
+	\Huge
+		JSON\_TABLE
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Preguntas}
+
+	\Huge
+	\begin{center}
+		¿?
+	\end{center}
+\end{frame}

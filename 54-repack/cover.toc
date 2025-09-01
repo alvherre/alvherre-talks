@@ -1,0 +1,4 @@
+\babel@toc {spanish}{}\relax 
+\beamer@sectionintoc {1}{Historical review}{4}{0}{1}
+\beamer@sectionintoc {2}{Repacking done right}{8}{0}{2}
+\beamer@subsectionintoc {2}{1}{Concurrent Repacking}{9}{0}{2}

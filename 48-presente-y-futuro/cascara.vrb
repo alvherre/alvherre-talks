@@ -1,0 +1,13 @@
+\frametitle{Temporal query}
+
+\includegraphics{temporal.jpg}
+
+\begin{verbatim}
+ALTER TABLE variants
+ADD CONSTRAINT tfk_variants_product_id
+FOREIGN KEY (product_id, PERIOD valid_at)
+REFERENCES (id, PERIOD valid_at);
+\end{verbatim}
+
+\footnotesize\url{https://www.pgcon.org/2019/schedule/events/1336.en.html}
+

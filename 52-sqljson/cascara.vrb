@@ -1,0 +1,32 @@
+\frametitle{\texttt{JSON\_TABLE()}}
+  \begin{lstlisting}[basicstyle=\tiny\ttfamily]
+SELECT j.*
+  FROM allstores,
+         json_table(alldata,
+                'strict $[*] ? (@.id == $storeid)' PASSING 42 AS storeidx
+                COLUMNS (
+                      store_id  integer path  '($.id)',
+                      manager   text path '($.manager)',
+                      NESTED '$.staff[*]' columns
+                        (name text path '$.name',
+                         straddress text path '$.address.street'
+                ))
+        ) j;
+
+─[ RECORD 1 ]──────────────────────
+store_id   │ 42
+manager    │ Lincoln Wisoky
+name       │ Norris Wilderman
+straddress │ 1135 Izumisano Parkway
+─[ RECORD 2 ]──────────────────────
+store_id   │ 42
+manager    │ Lincoln Wisoky
+name       │ Lester Stehr
+straddress │ 698 Otsu Street
+─[ RECORD 3 ]──────────────────────
+store_id   │ 42
+manager    │ Lincoln Wisoky
+name       │ Brendon Thiel
+straddress │ 1966 Amroha Avenue
+  \end{lstlisting}
+%stopzone
