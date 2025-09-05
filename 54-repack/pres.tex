@@ -54,11 +54,41 @@
 
 \begin{frame}
 	\frametitle{\texttt{pg\_repack}}
+  \begin{itemize}
+    \item Forked from \texttt{pg\_reorg} in 2012 (\texttt{pg\_reorg} started
+      in 2008)
+    \item SQL and C functions installed on server, but the workflow is
+      controlled by a client application
+    \item Like VACUUM FULL / CLUSTER it copies the useful data to a new table,
+      swaps the files and drops the new table. Exclusive lock is held during
+      the swap.
+    \item Data changes done by applications during the copying are captured by
+      triggers and written to a ``log table''. They are applied right before
+      the swap.
+    \item Multiple backends can be launched to rebuild indexes.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{\texttt{pg\_squeeze}}
+        \frametitle{\texttt{pg\_squeeze}}
+  \begin{itemize}
+    \item Started in 2016 (PostgreSQL 9.5)
+    \item The idea was to use background worker to launch \texttt{pg\_repack} automatically
+    \item \texttt{pg\_repack} is implemented both on server and client side --
+      not really suitable for background worker
+    \item PostgreSQL 9.4 introduced logical decoding -- I thought it should be
+      simpler to use this instead of triggers to capture data changes
+    \item Use server API rather than SQL commands to manipulate tables,
+      indexes and data.
+  \end{itemize}
 \end{frame}
+
+\begin{frame}
+        \frametitle{\texttt{pg\_squeeze}}
+%% TODO 1. Disk space requirements, 2. Scheduling, 3. GUC for maximum lock time
+%% (probably not used much)
+\end{frame}
+
 
 \section{Repacking done right}
 \begin{frame}
@@ -68,4 +98,35 @@
 \subsection{Concurrent Repacking}
 \begin{frame}
 	\frametitle{REPACK CONCURRENTLY}
+
+% TODO (if there's enough time) Explain differences between pg_squeeze and
+% REPACK CONCURRENTLY.
+%
+% 1. pg_squeeze uses AccessShareLock and releases it before it requests
+% AccessExclusiveLock (for the file swap), in order to avoid deadlock. If the
+% table changed in between, the whole processing is aborted. This approach is
+% proably overly cautious. In REPACK CONCURRENTLY, we use
+% ShareUpdateExclusiveLock and then simply upgrade it to AccessExclusiveLock,
+% so we don't have to check for concurrent catalog changes. (The risk of
+% deadlock during the lock upgrade is probably low.)
+%
+% 2. Since REPACK CONCURRENTLY does not release the ShareUpdateExclusiveLock
+% until done, and since this lock conflicts with VACUUM, it does not have to
+% care about the xmin horizon (Note: setting the slot's xmin to
+% InvalidTransactionId is yet to be implemented.) On the other hand,
+% pg_squeeze allows for VACUUM most of the time, so has to block the xmin
+% horizon until the initial copy is complete.
+%
+% 2. Unlike extension, the core code can implement MVCC safety. (Although not
+% necessarily in PG 19).
+%
+% 3. REPACK does not implement scheduling - not sure it's necessary,
+% extensions can do that.
+\end{frame}
+
+
+\section{Future work}
+\begin{frame}
+  \frametitle{Future work}
+  %% TODO 1. Logical decoding by background worker, 2. MVCC safety.
 \end{frame}
