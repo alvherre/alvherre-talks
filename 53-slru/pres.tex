@@ -1,4 +1,4 @@
-% :vim:set sw=3:
+% :vim:set sw=2:
 \newcommand{\linksize}{\scriptsize}
 %\newcommand{\textrightarrow}{$\,\to\,$}
 \begin{document}
@@ -10,7 +10,7 @@
 \begin{frame}
   \frametitle{Who am I?}
   \begin{itemize}
-    \item Álvaro Herrera, \href{mailto:alvherre@kurilemu.de}{alvherre@kurilemu.de}
+    \item \href{mailto:alvherre@kurilemu.de}{Álvaro Herrera \texttt{<alvherre@kurilemu.de>}}
     \item Postgres contributor since 2002
     \item Working as a Postgres developer for 2ndQuadrant/EDB since 2012
     \item Worked on a number of SLRU-related projects:
@@ -19,8 +19,8 @@
 	\item multixacts
 	\item commit timestamps
       \end{itemize}
-\item \linksize I also came up with autovacuum, background workers, BRIN indexes, and more
-\begin{itemize} \item \linksize Feel free to grab hold of me on hallways to talk about stuff \end{itemize}
+    \item \linksize I also came up with autovacuum, background workers, BRIN indexes, and more
+    \begin{itemize} \item \linksize Feel free to grab hold of me on hallways to talk about stuff \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -29,10 +29,11 @@
   \begin{enumerate}
     \item Historical review of SLRU development
     \item Report of an SLRU performance problem
-    \item Description of the solution
+    \item Development of the solution, step by step
+    \item New Parameters in Postgres 17
+    \item Call to Action and Future work
   \end{enumerate}
 \end{frame}
-
 
 \begin{frame}
    \frametitle{What {\bf is} an SLRU?}
@@ -53,7 +54,6 @@
    \end{itemize}
 \end{frame}
 
-
 \section{Historical review of SLRU development}
 \begin{frame}
   \sectionpage
@@ -62,17 +62,14 @@
 
 \begin{frame}
   \frametitle{Development History: 1. \texttt{pg\_clog}}
-% Mailing list thread: https://www.postgresql.org/message-id/flat/8382.973291660%40sss.pgh.pa.us
+  % Mailing list thread: https://www.postgresql.org/message-id/flat/8382.973291660%40sss.pgh.pa.us
   \begin{itemize}
-    \item Problem: after 4 billion transactions, your database ist total kaputt \footnote{
-        \fontsize{6}{8}\selectfont \href{https://www.postgresql.org/message-id/flat/8382.973291660\%40sss.pgh.pa.us}
+    \item Problem in Postgres 7.1: after 4 billion transactions, your database ist total kaputt \footnote{%
+	\fontsize{6}{8}\selectfont \href{https://www.postgresql.org/message-id/flat/8382.973291660\%40sss.pgh.pa.us}
 	{Transaction ID wraparound: problem and proposed solution (Fri 03 Nov 2000) \faExternalLink}}
-    \item Fix: Simplistic \texttt{pg\_log} pseudo-relation is replaced with \texttt{pg\_clog}
-    \item {\linksize \href{https://git.postgresql.org/cgit/postgresql.git/commit/?id=2589735da08c4e597accb6eab5ae65b6339ee630}
-      {Commit 2589735da08c: \faExternalLink \\
-      Replace implementation of pg\_log as a relation accessed through the buffer manager with 'pg\_clog', a specialized access method modeled on pg\_xlog. \\
-      Tom Lane \\
-      Sat Aug 25 2001, Postgres 7.2}}
+      \item Why? 32-bit integer wraparound!
+
+      \includegraphics[width=0.85\textwidth]{pg_log.png}
   \end{itemize}
 \end{frame}
 
@@ -84,57 +81,75 @@
   \includegraphics[width=0.7\textwidth]{tuple0.png}
 
 \item Two bits per transaction id (xid):
-      \begin{itemize}
-	\item 00 \textrightarrow{} ``in-progress''
-	\item 01 \textrightarrow{} ``aborted''
-	\item 10 \textrightarrow{} ``committed''
-      \end{itemize}
+  \begin{itemize}
+    \item 00 \textrightarrow{} ``in-progress''
+    \item 01 \textrightarrow{} ``aborted''
+    \item 10 \textrightarrow{} ``committed''
   \end{itemize}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{How \texttt{pg\_clog} works}
   \includegraphics[width=0.85\textwidth]{pg_log.png}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Development History: 1. \texttt{pg\_clog} (2)}
+
   \begin{itemize}
-    \item 0x8000 (decimal 32768) transactions per 8kB page
-    \item 8 in-memory pages store the status of $ 32768 * 8 = 262144 = 256k $ transactions
+    \item Fix: Simplistic \texttt{pg\_log} pseudo-relation is replaced with \texttt{pg\_clog}
+    \item {\linksize \href{https://git.postgresql.org/cgit/postgresql.git/commit/?id=2589735da08c4e597accb6eab5ae65b6339ee630}
+      {Commit 2589735da08c: \faExternalLink \\
+      Replace implementation of pg\_log as a relation accessed through the buffer manager with 'pg\_clog', a specialized access method modeled on pg\_xlog. \\
+      Tom Lane \\
+      Sat Aug 25 2001, Postgres 7.2}}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{How does \texttt{pg\_clog} work}
+  \includegraphics[width=0.85\textwidth]{pg_clog.png}
+  \begin{itemize}
+    \item 4 transactions per byte
+    \item 32k transactions per 8kB page
     \item 32 pages per file
-      \begin{itemize}
-	\item after 1M transactions, a file can be removed
-	\item ``wraparound'' is now possible
-      \end{itemize}
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{How \texttt{pg\_clog} works (2)}
-  \begin{itemize}
-    \item At this point, LRU is an internal \texttt{pg\_clog} implementation detail
-    \item Harcoded buffer size of 8 pages
-      \begin{itemize}
-	\item Much later, \texttt{pg\_clog} was renamed \texttt{pg\_xact}, 
-	  commit 88e66d193fba (2017).
-      \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{How \texttt{pg\_clog} works (3)}
-  \includegraphics[width=0.85\textwidth]{tuple-hinted.png}
+  \frametitle{How does \texttt{pg\_clog} work (2)}
   \begin{itemize}
     \item If transaction committed long enough ago, ``hint bits'' are set
       in the ``infomask''
-    \item When tuples are ``hinted'', no \texttt{pg\_clog} lookups 
+      \includegraphics[width=0.80\textwidth]{tuple-hinted.png}
+    \item When tuples are ``hinted'', no \texttt{pg\_clog} lookups are needed
     \item Old \texttt{pg\_clog} segments no longer needed
+      \begin{itemize}
+    \item ``wraparound'' is now possible!
+      \end{itemize}
   \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{How does \texttt{pg\_clog} work (3)}
+  \begin{itemize}
+
+    \item 8 in-memory pages store the status of $ 32768 * 8 = 262144 = 256k $ transactions
+    \item At this point, LRU is an internal \texttt{pg\_clog} implementation detail
+      \begin{itemize}
+	\item \texttt{pg\_clog} no longer in \textit{shared buffers}, so a buffer management algorithm was needed
+	\item LRU was open-coded in \texttt{clog.c}
+      \end{itemize}
+    \item[]
+    \item Much later, \texttt{pg\_clog} was renamed \texttt{pg\_xact}, 
+      commit \href{https://git.postgresql.org/cgit/postgresql.git/commit/?id=88e66d193fba}{88e66d193fba} (2017).
+  \end{itemize}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Development History: 2. \texttt{slru.c}}
   \begin{itemize}
     \item My first big project: \texttt{SAVEPOINTS} (geb. ``nested transactions'')
-    \item {\texttt slru.c} was born from \texttt{pg\_clog} to support this
+    \item \texttt{slru.c} was born from \texttt{pg\_clog} to support this
     \item {\linksize \href{https://git.postgresql.org/cgit/postgresql.git/commit/?id=0abe7431c6d7a022e7f24a4f145c702900f56174}
       {Commit 0abe7431c6d7: \faExternalLink \\
       This patch extracts page buffer pooling and the simple least-recently-used strategy from clog.c into slru.c. \\
@@ -154,35 +169,36 @@
       Nested transactions. \\
       Álvaro Herrera, with some help from Tom Lane \\
       Thu Jul 1 2004, Postgres 8.0}}
-    \item \texttt{pg\_subtrans}: needed to store parent TransactionId for each \textit{subtransaction}
-    \item First user of \texttt{slru.c} outside of \texttt{pg\_clog.c}
-  \includegraphics[width=0.85\textwidth]{pg_subtrans.png}
+    \item First user of \texttt{slru.c} outside of \texttt{clog.c}
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{How does \texttt{pg\_subtrans} work?}
-  \begin{itemize}
-    \item 4 bytes per transaction (16x larger than \texttt{pg\_clog}!)
-    \item 8 pages of 8kB each have room for 16k transactions
-    \item But what is \texttt{pg\_subtrans} \emph{for}?
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{What is \texttt{pg\_subtrans} for?}
-  Without subtransactions, answering whether a transaction is running
-  is easy reading only memory:
+  \frametitle{Is transaction XYZ running? (no subtransactions)}
+  Without subtransactions, knowing whether a transaction is running
+  is easy, it only requires reading memory:
   \includegraphics[width=0.8\textwidth]{pgproc-no-subxids.png}
 \end{frame}
 
 \begin{frame}
-  \frametitle{What is \texttt{pg\_subtrans} for? (2)}
+  \frametitle{Is transaction XYZ running? (w/ subtransactions)}
+  \center \includegraphics[width=0.7\textwidth]{pgproc-with-subxids.png}
   \begin{itemize}
     \item \texttt{pg\_subtrans} responds to ``is transaction X running?'' in presence of subtransactions
-    \item ... only needed for transactions with >64 subtransactions
+      \begin{itemize}
+	\item ... only needed for transactions with >64 subtransactions
+      \end{itemize}
   \end{itemize}
-  \center \includegraphics[width=0.7\textwidth]{pgproc-with-subxids.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{So what is \texttt{pg\_subtrans} \emph{for}?}
+  \begin{itemize}
+    \item \texttt{pg\_subtrans}: needed to store parent TransactionId for each \textit{subtransaction}
+    \item 4 bytes per transaction (16x larger than \texttt{pg\_clog}!)
+    \item 8 pages of 8kB each have room for 16k transactions
+  \end{itemize}
+  \includegraphics[width=0.85\textwidth]{pg_subtrans.png}
 \end{frame}
 
 \begin{frame}
@@ -199,14 +215,14 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{foreign keys: avoiding SELECT FOR UPDATE}
+  \frametitle{Foreign keys: avoiding SELECT FOR UPDATE}
   \includegraphics[width=0.8\textwidth]{select-for-update.png}
   \vspace{0.7cm}
   \includegraphics[width=\textwidth]{tuple.png}
 \end{frame}
 
 \begin{frame}
-  \frametitle{foreign keys: SELECT FOR SHARE to the rescue}
+  \frametitle{Foreign keys: SELECT FOR SHARE to the rescue}
   \includegraphics[width=0.8\textwidth]{select-for-share.png}
 \end{frame}
 
@@ -242,7 +258,8 @@
   \frametitle{(Short) theory of operation}
   Why a small number of buffers?  Here's how it works:
   \begin{enumerate}
-    \item \alert<2>{Scan linearly the array of buffers} to see if one contains the page we want
+    \item With the SLRU control lock held:
+    \item \alert<2>{Linearly scan the array of buffers} to see if one contains the page we want
     \item If we find it, we're done  % TODO mark the underline
     \item If not, the scan has chosen a ``victim'' buffer to evict (least recently used)
       \begin{enumerate}
@@ -268,7 +285,7 @@
       \begin{itemize}
 	\item ... but pages only have to be retained until all backends read notification messages
 	\item ... which happens as soon as they run any command at all
-	\item Small chances of overflowing the buffer
+	\item \sout{Small chances of overflowing the buffer}
       \end{itemize}
   \end{itemize}
 \end{frame}
@@ -342,7 +359,7 @@
    \end{itemize}
 \end{frame}
 
-\section{Developments for PostgreSQL 17}
+\section{Moving Forward}
 \begin{frame}
   \sectionpage
 \end{frame}
@@ -487,6 +504,22 @@ I've found out that:
 \end{frame}
 
 \begin{frame}
+  \frametitle{Restricting the scan to banks}
+  \begin{enumerate}
+    \item \alert{With the bank lock held:}
+    \item Linearly scan the array of buffers \alert{of the bank that contains the page} to see if one contains the page we want
+    \item If we find it, \emph{we're done}
+    \item If not, the scan has chosen a ``victim'' buffer to evict (least recently used)
+      \begin{enumerate}
+	\item Evict it, leaving buffer free
+	\item Load our page onto our buffer
+	\item Increment ``recently used'' counter
+      \end{enumerate}
+    \item Now the page in buffer can be processed 
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
   \frametitle{New Kid in Town: \texttt{pg\_stat\_slru}}
   \begin{itemize}
     \item \texttt{pg\_stat\_slru} was born as the initial problem was being discussed
@@ -554,36 +587,22 @@ SELECT name, blks_zeroed, blks_hit, blks_read, blks_written
 
   Dilip Kumar proposed:
   \begin{itemize}
-    \item Modify operations to LRU counter to use atomic access
     \item Make the locking occur per bank rather than globally
+    \item Modify operations to LRU counter to use atomic access
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Operating with atomics}
   \begin{enumerate}
-    \item Scan linearly the array of buffers to see if one contains the page we want
+    \item With the bank lock held:
+    \item Linearly scan the array of buffers of the bank that contains the page to see if one contains the page we want
     \item If we find it, \emph{we're done}
     \item If not, the scan has chosen a ``victim'' buffer to evict (least recently used)
       \begin{enumerate}
 	\item Evict it, leaving buffer free
 	\item Load our page onto our buffer
 	\item \alert{Increment ``recently used'' counter using atomic ops}
-      \end{enumerate}
-    \item Now the page in buffer can be processed 
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Restricting the scan to banks}
-  \begin{enumerate}
-    \item Scan linearly the array of buffers \alert{of the bank that contains the page} to see if one contains the page we want
-    \item If we find it, \emph{we're done}
-    \item If not, the scan has chosen a ``victim'' buffer to evict (least recently used)
-      \begin{enumerate}
-	\item Evict it, leaving buffer free
-	\item Load our page onto our buffer
-	\item Increment ``recently used'' counter using atomic ops
       \end{enumerate}
     \item Now the page in buffer can be processed 
   \end{enumerate}
@@ -616,7 +635,6 @@ SELECT name, blks_zeroed, blks_hit, blks_read, blks_written
       Wed Feb 28 2024, Postgres 17}}
   \end{itemize}
 \end{frame}
-
 
 \begin{frame}[fragile]
   \frametitle{The New GUCs}
@@ -691,7 +709,7 @@ transaction_buffers = 0
       \end{itemize}
     \item Improve LRU algorithm
       \begin{itemize}
-	\item Ants Aasma has said he has better code; waiting for him to post it
+	\item Ants Aasma has better code
 	\item I'm especially hoping it'll avoid my stupid use of integer division
       \end{itemize}
   \end{itemize}
