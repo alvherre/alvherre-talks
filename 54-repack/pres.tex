@@ -59,13 +59,12 @@
       in 2008)
     \item SQL and C functions installed on server, but the workflow is
       controlled by a client application
-    \item Like VACUUM FULL / CLUSTER it copies the useful data to a new table,
-      swaps the files and drops the new table. Exclusive lock is held during
-      the swap.
+    \item Like VACUUM FULL / CLUSTER it removes the bloat by copying the
+      useful data to a new table, swaps the files and drops the new
+      table. Exclusive lock is held only during the swap.
     \item Data changes done by applications during the copying are captured by
       triggers and written to a ``log table''. They are applied right before
       the swap.
-    \item Multiple backends can be launched to rebuild indexes.
   \end{itemize}
 \end{frame}
 
