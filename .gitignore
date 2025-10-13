@@ -1,0 +1,6 @@
+# Global excludes across all subdirectories
+*.nav
+*.out
+*.toc
+*.log
+*.pdf
