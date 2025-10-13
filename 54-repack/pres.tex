@@ -8,34 +8,54 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{Antonín Houska}
-  \begin{itemize}
-    \item Antonín Houska, \href{mailto:ah@cybertec.at}{ah@cybertec.at}
-    \item Postgres contributor since 2012
-    \item Working as a Postgres developer for CYBERTEC since 2012
-  \end{itemize}
+  \frametitle{Antonín Houska}
+
+  \begin{columns}
+    \begin{column}{0.8\textwidth}
+      \begin{itemize}
+	\item Antonín Houska, \href{mailto:ah@cybertec.at}{ah@cybertec.at}
+	\item Postgres contributor since 2012
+	\item Working as a Postgres developer for CYBERTEC since 2012
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.2\textwidth}
+      \begin{center}
+      \includegraphics[width=0.8\textwidth]{Antonin-Houska-faceshot.jpg}
+      \end{center}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Álvaro Herrera}
-  \begin{itemize}
-    \item Álvaro Herrera, \href{mailto:alvherre@kurilemu.de}{alvherre@kurilemu.de}
-    \item Postgres contributor since 2002
-    \item Working as a Postgres developer for 2ndQuadrant/EDB since 2012
-\begin{itemize} \item \linksize Feel free to grab hold of me on hallways to talk about stuff \end{itemize}
-  \end{itemize}
+  \frametitle{Álvaro Herrera}
+
+  \begin{columns}
+    \begin{column}{0.8\textwidth}
+      \begin{itemize}
+	\item Álvaro Herrera, \href{mailto:alvherre@kurilemu.de}{alvherre@kurilemu.de}
+	\item Postgres contributor since 2002
+	\item Working as a Postgres developer for EDB since 2012
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.2\textwidth}
+      \begin{center}
+	\includegraphics[width=0.8\textwidth]{alvaro-faceshot.jpg}
+      \end{center}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
   \frametitle{Talk structure}
   \begin{enumerate}
     \item The problem: table bloat
-    \item The historical solution: VACUUM FULL
+    \item The historical solution: VACUUM and friends
     \item Third-party solutions
-	    \begin{itemize}
-		    \item \emph{pg\_repack}
-		    \item \emph{pg\_squeeze}
-	    \end{itemize}
+      \begin{itemize}
+	\item \texttt{pg\_reorg}
+	\item \texttt{pg\_repack}
+	\item \texttt{pg\_squeeze}
+      \end{itemize}
     \item Non-concurrent REPACK
     \item REPACK CONCURRENTLY
   \end{enumerate}
@@ -44,17 +64,58 @@
 \section{Historical review}
 
 \begin{frame}
-	\frametitle{The problem: table bloat}
-    \includegraphics[height=\sizeforimages\textheight]{images/bloat_01.png}
+  \frametitle{Table bloat}
+  \begin{itemize}
+    \item Comes from \emph{non-overwriting} MVCC implementation
+    \item Non-overwriting: old versions of updated tuples are not immediately removable
+    \item \emph{vacuuming}\footnote{And HOT-pruning.} takes care of them afterwards
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{The problem: table bloat}
-    \includegraphics[height=\sizeforimages\textheight]{images/bloat_02.png}
+  \frametitle{Table bloat: other databases}
+  \includegraphics[width=\sizeforimages\textwidth]{images/oracle_01.png}
+
+  An overwriting storage manager might use a ``rollback segment''
 \end{frame}
 
 \begin{frame}
-	\frametitle{VACUUM FULL}
+  \frametitle{Table bloat: other databases}
+  \includegraphics[width=\sizeforimages\textwidth]{images/oracle_02.png}
+
+  As the table is updated, the old versions are moved to the rollback segment. The table doesn't need later cleanup
+\end{frame}
+
+\begin{frame}
+  \frametitle{A rollback segment?}
+  \begin{itemize}
+    \item requires handling of disk space for it
+    \item and later cleanup
+    \item notably: rollbacks are expensive
+    \item<2> and is more difficult to implement
+    \item<2> Postgres tried: see \texttt{zheap}
+    \item<2> Not yet achieved!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The problem: table bloat}
+  \includegraphics[height=\sizeforimages\textheight]{images/bloat_01.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The problem: table bloat}
+  \includegraphics[height=\sizeforimages\textheight]{images/bloat_02.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{VACUUM FULL}
+  \includegraphics[height=\sizeforimages\textheight]{images/vacuum_full_01.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{VACUUM FULL}
+  \includegraphics[height=\sizeforimages\textheight]{images/vacuum_full_02.png}
 \end{frame}
 
 \begin{frame}
@@ -86,37 +147,63 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{\texttt{pg\_repack}}
+  \frametitle{\texttt{pg\_reorg}}
   \begin{itemize}
-    \item Forked from \texttt{pg\_reorg} in 2012 (\texttt{pg\_reorg} started
-      in 2008)
-    \item SQL and C functions installed on server, but the workflow is
-      controlled by a client application
+    \item Created in 2008 by NTT
+    \item \href{https://ossc-db.github.io/pg_reorg/pg_reorg.html}{\texttt{https://ossc-db.github.io/pg\_reorg/}}
+      \begin{quote}
+	``The module is developed to be a better alternative of CLUSTER and VACUUM FULL.''
+      \end{quote}
+    \item Featured in Depesz's blog in 2011: \href{https://www.depesz.com/2011/07/06/bloat-happens/}{Bloat Happens}
+      \begin{quote}
+	``All in all – it's a great tool, which does amazing job.''
+      \end{quote}
+    \item Last release was 1.1.9 in 2013
+    \item Pronounced dead in 2020
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{pg\_repack}}
+  \begin{itemize}
+    \item Forked from \texttt{pg\_reorg} in 2012
+    \item Implemented in two parts:
+      \begin{itemize}
+	\item A few server-side SQL and C functions
+	\item Workflow controlled by a client application
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{pg\_repack}'s algorithm}
+  \begin{itemize}
     \item Like VACUUM FULL / CLUSTER it removes the bloat by copying the
       useful data to a new table, swaps the files and drops the new
       table. Exclusive lock is held only during the swap.
     \item Data changes done by applications during the copying are captured by
       triggers and written to a ``log table''. They are applied right before
       the swap.
+    \item Multiple backends can be launched to rebuild indexes
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{\texttt{pg\_repack}}
   \begin{center}
-\includegraphics[height=\sizeforimages\textheight]{images/pg_repack_01.png}
+    \includegraphics[height=\sizeforimages\textheight]{images/pg_repack_01.png}
   \end{center}
 \end{frame}
 
 \begin{frame}
   \frametitle{\texttt{pg\_repack}}
   \begin{center}
-\includegraphics[height=\sizeforimages\textheight]{images/pg_repack_02.png}
+    \includegraphics[height=\sizeforimages\textheight]{images/pg_repack_02.png}
   \end{center}
 \end{frame}
 
 \begin{frame}
-        \frametitle{\texttt{pg\_squeeze}}
+  \frametitle{\texttt{pg\_squeeze}}
   \begin{itemize}
     \item Started in 2016 (PostgreSQL 9.5)
     \item The idea was to use background worker to launch \texttt{pg\_repack} automatically
@@ -132,21 +219,21 @@
 \begin{frame}
   \frametitle{\texttt{pg\_squeeze}}
   \begin{center}
-\includegraphics[height=\sizeforimages\textheight]{images/pg_squeeze_01.png}
+    \includegraphics[height=\sizeforimages\textheight]{images/pg_squeeze_01.png}
   \end{center}
 \end{frame}
 
 \begin{frame}
   \frametitle{\texttt{pg\_squeeze}}
   \begin{center}
-\includegraphics[height=\sizeforimages\textheight]{images/pg_squeeze_02.png}
+    \includegraphics[height=\sizeforimages\textheight]{images/pg_squeeze_02.png}
   \end{center}
 \end{frame}
 
 \begin{frame}
   \frametitle{\texttt{pg\_squeeze}}
   \begin{center}
-\includegraphics[height=\sizeforimages\textheight]{images/pg_squeeze_03.png}
+    \includegraphics[height=\sizeforimages\textheight]{images/pg_squeeze_03.png}
   \end{center}
 \end{frame}
 
@@ -156,15 +243,45 @@
 %% (probably not used much)
 \end{frame}
 
-
 \section{Repacking done right}
 \begin{frame}
-	\frametitle{The REPACK command}
+  \frametitle{The REPACK command}
+  \begin{itemize}
+    \item \texttt{REPACK} subsumes \texttt{CLUSTER} and \texttt{VACUUM FULL}
+  \end{itemize}
+  \includegraphics[width=\textwidth]{repack.png}
 \end{frame}
 
-\subsection{Concurrent Repacking}
 \begin{frame}
-	\frametitle{REPACK CONCURRENTLY}
+  \frametitle{Single-table \texttt{REPACK} forms}
+  \begin{itemize}
+    \item single-table \texttt{vacuum full}: \\
+      \texttt{REPACK (ANALYZE) customers;}
+    \item single-table \texttt{cluster}: \\
+      \texttt{REPACK (ANALYZE) customers USING INDEX cust\_pkey;}
+    \item single-table \texttt{cluster} using the stored index: \\
+      \texttt{REPACK (ANALYZE) customers USING INDEX;}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Full-database \texttt{REPACK} forms}
+  \begin{itemize}
+    \item whole-database \texttt{VACUUM FULL}: \\
+      \texttt{REPACK;}
+    \item whole-database \texttt{CLUSTER}: \\
+      \texttt{REPACK USING INDEX;}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{REPACK CONCURRENTLY}
+
+  \begin{itemize}
+    \item This behaves similar to \texttt{pg\_squeeze}
+    \item similarities are ...?
+    \item differences of note are ...?
+  \end{itemize}
 
 % TODO (if there's enough time) Explain differences between pg_squeeze and
 % REPACK CONCURRENTLY.
@@ -191,9 +308,20 @@
 % extensions can do that.
 \end{frame}
 
+\begin{frame}
+  \frametitle{\texttt{pg\_repackdb}}
+
+    \includegraphics[height=\sizeforimages\textheight]{repackdb.png}
+\end{frame}
 
 \section{Future work}
+
 \begin{frame}
   \frametitle{Future work}
-  %% TODO 1. Logical decoding by background worker, 2. MVCC safety.
+  \begin{itemize}
+    \item allow to enable logical decoding on the fly
+    \item use a background worker for logical decoding
+    \item MVCC safety?
+    \item Better control over repacking multiple tables?
+  \end{itemize}
 \end{frame}

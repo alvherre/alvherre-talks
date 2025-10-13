@@ -17,7 +17,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[export]{adjustbox} % https://texblog.org/2014/02/20/figure-with-border-in-latex/
-\usepackage{ulem}
+\usepackage[normalem]{ulem}
 
 \let\checkmark\undefined  % dingbat defines this, but it's already been defined previously. wtf.
 \usepackage{dingbat} % WARNING -- hacked up!
@@ -62,26 +62,27 @@
 
 \author{Antonín Houska -- Postgres developer, CYBERTEC \\
 Álvaro Herrera -- Postgres developer, EDB}
+\newcommand{\sizeforedblogo}{0.11}
+\newcommand{\sizeforconflogo}{0.13}
 \newcommand{\sizeforlogos}{0.1}
 \newcommand{\sizeforimages}{0.8}
 % \institute{\vspace*{-0.2cm}\href{https://www.enterprisedb.com/}{\includegraphics[height=\sizeforlogos\paperheight]{edb_portrait_color_grey.png}} \hspace{1cm} \href{https://p2d2.cz/2025/}{\includegraphics[height=\sizeforlogos\paperheight]{p2d2_logo_1.png}}}
-\institute{\vspace*{-0.2cm}\href{https://www.enterprisedb.com/}{\includegraphics[height=\sizeforlogos\paperheight]{edb_portrait_color_grey.png}} \hspace{1cm} \href{https://2025.pgconf.eu/}{\includegraphics[height=\sizeforlogos\paperheight]{logo_pgconf_eu.jpg}} \hspace{1cm} \href{https://cybertec.at/}{\includegraphics[height=\sizeforlogos\paperheight]{CYBERTEC-logo-without-claim.png}}}
+\institute{\vspace*{-0.2cm}\href{https://www.enterprisedb.com/}{\includegraphics[height=\sizeforedblogo\paperheight]{edb_postgres_ai.png}} \hspace{1cm} \href{https://2025.pgconf.eu/}{\includegraphics[height=\sizeforconflogo\paperheight]{logo_pgconf_eu.jpg}} \hspace{1cm} \href{https://cybertec.at/}{\includegraphics[height=\sizeforlogos\paperheight]{CYBERTEC-logo-without-claim.png}}}
 \date{Postgres Conference Europe 2025 \\
 Riga, Latvia \\
 23-24 October 2025}
 
 %\href{https://p2d2.cz/2025/}{\includegraphics[width=2cm]{p2d2_logo_1.png}} \\
 
-
 % Footer for all slides
 \setbeamertemplate{footline}{%
   \hspace{0.3cm}%
-  \href{https://www.enterprisedb.com/}{\includegraphics[height=.4cm]{edb_landscape_color_grey.png}}%
-  \hspace{0.3cm}%
-  \href{https://www.cybertec.at/}{\includegraphics[height=.4cm]{CYBERTEC-logo-without-claim.png}}%
+  \href{https://www.enterprisedb.com/}{\includegraphics[height=.45cm]{edb_postgres_ai_lightmode-100.jpg}}%
   \hfill%
   \href{https://2025.pgconf.eu/}{\includegraphics[height=20px]{logo_pgconf_eu.jpg}}\hspace{0.3cm}%
-  \vspace{0.2cm}%
+  \hfill%
+  \href{https://www.cybertec.at/}{\includegraphics[height=.4cm]{CYBERTEC-logo-without-claim.png}}%
+  \hspace{0.3cm}%
   }
 
 %https://tex.stackexchange.com/questions/119277/non-bitmapped-thumb-up-symbol-for-flagging-good-practice-tips
@@ -152,9 +153,9 @@ literate={á}{{\'{a}}}{1}
   Antonín Houska, {\color{bluecoal}  \href{https://cybertec.at/}{CYBERTEC}} \\
   \href{mailto:ah@cybertec.at}{\texttt{ah@cybertec.at}} \\
 \vspace{0.5cm}
-  Álvaro Herrera, {\color{bluecoal}  \href{https://enterprisedb.com/}{EDB (geb. EnterpriseDB)}} \\
+  Álvaro Herrera, {\color{bluecoal}  \href{https://enterprisedb.com/}{EDB}} \\
   \href{mailto:alvherre@kurilemu.de}{\texttt{alvherre@kurilemu.de}} \\
-  Mastodon: \href{https://lile.cl/@alvherre}{\texttt{https://lile.cl/@alvherre/}}
+	{\tiny Mastodon:} \href{https://lile.cl/@alvherre}{\texttt{https://lile.cl/@alvherre/}}
 
   \vfill
 \end{frame}
