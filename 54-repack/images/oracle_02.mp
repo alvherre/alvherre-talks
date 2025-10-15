@@ -37,11 +37,15 @@ beginfig(1);
   setcolumn(1, 1, "NEW");
   setcolumn(2, 0, "4");
   setcolumn(2, 1, "NEW");
+  % Dummy data to adjust the table width.
+  setcolumn(3, 0, "4");
+  setcolumn(3, 1, "RESOLVED");
   table[1].ll = (300, 0);
   table[1].row[3].hidden := true;
 
   createlabelbig("Rollback segment");
-  label[0].ll = table[1].row[0].left + (0, objspacing);
+  %label[0].ll = table[1].row[0].left + (0, objspacing);
+  label[0].lower = table[1].upper + (0, objspacing);
   label[0].textonly := true;
 
   finalizetables;
@@ -55,7 +59,7 @@ beginfig(1);
   %   ((xpart label[0].right,
   % 	ypart table[0].ur) + (table[0].right - table[0].lr));
 
-  initboundingbox(table[0].ll)((xpart table[1].right, ypart table[0].ur));
+  initboundingbox(table[0].ll)(label[0].ur);
   computescalefactor(metapg.bbox);
 
   adjustpens;
@@ -71,9 +75,12 @@ beginfig(1);
 
   pickup arrowpen;
   % Arrows to row versions in rollback segment.
-  drawarrow table[0].row[0].right{(1, 0.5)}...{(1, 1)}table[1].row[0].left;
-  drawarrow table[0].row[1].right{(2, 0.3)}...{(2, 1)}table[1].row[1].left;
-  drawarrow table[0].row[3].right{(1, 0.1)}...{(1, 1)}table[1].row[2].left;
+  % drawarrow table[0].row[0].right{(1, 0.5)}...{(1, 1)}table[1].row[0].left;
+  % drawarrow table[0].row[1].right{(2, 0.3)}...{(2, 1)}table[1].row[1].left;
+  % drawarrow table[0].row[3].right{(1, 0.1)}...{(1, 1)}table[1].row[2].left;
+  drawarrow table[0].row[0].right...table[1].row[0].left;
+  drawarrow table[0].row[1].right...table[1].row[1].left;
+  drawarrow table[0].row[3].right...table[1].row[2].left;
 
   %drawboundingbox;
 endfig;

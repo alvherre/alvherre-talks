@@ -27,8 +27,18 @@ beginfig(1);
   table[0].ll = (0, 0);
 
   createtable(4, 2);
-  % How can I make this box wider?
   setcolalignments(r,l);
+
+  % Dummy data to achieve "normal" width of the table.
+  setcolumn(0, 0, "1");
+  setcolumn(0, 1, "NEW");
+  setcolumn(1, 0, "2");
+  setcolumn(1, 1, "NEW");
+  setcolumn(2, 0, "3");
+  setcolumn(2, 1, "RESOLVED");
+  setcolumn(3, 0, "4");
+  setcolumn(3, 1, "NEW");
+
   table[1].ll = (300, 0);
   table[1].row[0].hidden := true;
   table[1].row[1].hidden := true;
@@ -36,7 +46,8 @@ beginfig(1);
   table[1].row[3].hidden := true;
 
   createlabelbig("Rollback segment");
-  label[0].ll = table[1].row[0].left + (0, objspacing);
+  %label[0].ll = table[1].row[0].left + (0, objspacing);
+  label[0].lower = table[1].upper + (0, objspacing);
   label[0].textonly := true;
 
   finalizetables;
@@ -54,7 +65,7 @@ beginfig(1);
   %   ((xpart label[0].right,
   % 	ypart table[0].ur) + (table[0].right - table[0].lr));
 
-  initboundingbox(table[0].ll)((xpart table[1].right, ypart table[0].ur));
+  initboundingbox(table[0].ll)(label[0].ur);
   computescalefactor(metapg.bbox);
 
   adjustpens;
