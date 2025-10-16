@@ -176,19 +176,6 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{\texttt{pg\_repack}'s algorithm}
-  \begin{itemize}
-    \item Like VACUUM FULL / CLUSTER it removes the bloat by copying the
-      useful data to a new table, swaps the files and drops the new
-      table. Exclusive lock is held only during the swap.
-    \item Data changes done by applications during the copying are captured by
-      triggers and written to a ``log table''. They are applied right before
-      the swap.
-    \item Multiple backends can be launched to rebuild indexes
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
   \frametitle{\texttt{pg\_repack}}
   \begin{center}
     \includegraphics[height=\sizeforimages\textheight]{images/pg_repack_01.png}
@@ -203,16 +190,29 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{\texttt{pg\_repack}'s algorithm}
+  \begin{itemize}
+    \item Like VACUUM FULL / CLUSTER it removes the bloat by copying the
+      useful data to a new table, swaps the files and drops the new
+      table.
+    \item Exclusive lock is held during the swap, but possibly a bit longer if
+      the database is too busy.
+    \item Data changes done by applications during the copying are captured by
+      triggers and written to a ``log table''. They are applied right before
+      the swap. (After the initial copying and rebuild of indexes has
+      completed.)
+      %% TODO Does this line fit to this slide, or should one slide be added?
+    \item Multiple backends can be launched to rebuild indexes
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{\texttt{pg\_squeeze}}
   \begin{itemize}
     \item Started in 2016 (PostgreSQL 9.5)
     \item The idea was to use background worker to launch \texttt{pg\_repack} automatically
     \item \texttt{pg\_repack} is implemented both on server and client side --
       not really suitable for background worker
-    \item PostgreSQL 9.4 introduced logical decoding -- I thought it should be
-      simpler to use this instead of triggers to capture data changes
-    \item Use server API rather than SQL commands to manipulate tables,
-      indexes and data.
   \end{itemize}
 \end{frame}
 
@@ -235,6 +235,19 @@
   \begin{center}
     \includegraphics[height=\sizeforimages\textheight]{images/pg_squeeze_03.png}
   \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{pg\_squeeze}}
+  \begin{itemize}
+    \item Use logical decoding (introduced in PostgreSQL 9.4) rather than
+      triggers.
+    \item Use server API rather than SQL commands to manipulate tables,
+      indexes and data.
+    \item Work with binary data rather then text.
+    \item cron-like scheduling. Squeeze table if the portion of bloat exceeded
+      threshold specified by the DBA.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
