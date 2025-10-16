@@ -83,7 +83,7 @@ beginfig(1);
   % initboundingbox(table[0].ll - (table[0].left - table[0].ll))
   %   ((xpart table[1].ur, ypart (label[1].ur + table[0].right - table[0].lr)));
 
-  initboundingbox(table[0].ll)((xpart label[0].right, ypart label[1].upper));
+  initboundingbox(table[0].ll)((xpart table[1].right, ypart label[1].upper));
   computescalefactor(metapg.bbox);
   adjustpens;
   fixpicturewidth;
