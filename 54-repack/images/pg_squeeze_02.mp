@@ -53,10 +53,10 @@ beginfig(1);
   % Horizontally, the WAL records are located between the table versions.
   xpart (walrecords[0].ul - table[0].ur) = xpart (table[1].ul - walrecords[0].ur);
 
-  createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1011}}");
+  %createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1011}}");
   % The commit records are related to the DML ones, so use the minimum space
   % to separate them.
-  xpart (walrecords[1].ul - walrecords[0].ur) = objspacing;
+  %xpart (walrecords[1].ul - walrecords[0].ur) = objspacing;
 
   % Table 1
   createtable(5, 2);
@@ -89,10 +89,10 @@ beginfig(1);
 
   createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1021}\hbox{tid=(0, 6)}\hbox{tid\_old=(0, 4)}\hbox{value='PENDING'}}");
   % See above.
-  xpart (walrecords[2].ul - table[1].ur) = xpart (table[2].ul - walrecords[2].ur);
+  xpart (walrecords[1].ul - table[1].ur) = xpart (table[2].ul - walrecords[1].ur);
 
-  createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1021}}");
-  xpart (walrecords[3].ul - walrecords[2].ur) = objspacing;
+  % createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1021}}");
+  % xpart (walrecords[3].ul - walrecords[2].ur) = objspacing;
 
   % Table 2
   createtable(6, 2);
@@ -129,10 +129,10 @@ beginfig(1);
 
   createwalrecord("\vbox{\hbox{INSERT}\vskip1em\hbox{xid=1049}\hbox{tid=(0, 7)}\hbox{value='NEW'}}");
   % See above.
-  xpart (walrecords[4].ul - table[2].ur) = xpart (table[3].ul - walrecords[4].ur);
+  xpart (walrecords[2].ul - table[2].ur) = xpart (table[3].ul - walrecords[2].ur);
 
-  createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1049}}");
-  xpart (walrecords[5].ul - walrecords[4].ur) = objspacing;
+  % createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1049}}");
+  % xpart (walrecords[5].ul - walrecords[4].ur) = objspacing;
 
   % Table 3
   createtable(7, 2);

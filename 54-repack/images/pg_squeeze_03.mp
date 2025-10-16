@@ -34,7 +34,7 @@ beginfig(1);
   table[0].ul + (0, 5objspacing) = wal.ll;
 
   % Transition to table 1.
-  createcmd("\vbox{\hbox{UPDATE issues}\hbox{SET state='REJECTED'}\hbox{WHERE id=1;}}");
+  createcmd("heap\_update(...)");
   % The command box is located in between the original and the new version of
   % the table.
   xpart(cmd[0].ul - table[0].ur) = xpart(table[1].ul - cmd[0].ur);
@@ -45,10 +45,10 @@ beginfig(1);
   % Horizontally, the WAL records are located between the table versions.
   xpart (walrecords[0].ul - table[0].ur) = xpart (table[1].ul - walrecords[0].ur);
 
-  createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1011}}");
+  %createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1011}}");
   % The commit records are related to the DML ones, so use the minimum space
   % to separate them.
-  xpart (walrecords[1].ul - walrecords[0].ur) = objspacing;
+  %xpart (walrecords[1].ul - walrecords[0].ur) = objspacing;
 
   % Table 1
   createtable(5, 2);
@@ -72,16 +72,16 @@ beginfig(1);
   table[0].ur + (spacingx, 0) = table[1].ul;
 
   % Transition to table 2.
-  createcmd("\vbox{\hbox{UPDATE issues}\hbox{SET state='PENDING'}\hbox{WHERE id=4;}}");
+  createcmd("heap\_update(...)");
   xpart(cmd[1].ul - table[1].ur) = xpart(table[2].ul - cmd[1].ur);
   ypart(table[4].ul - cmd[1].ul) = ypart(cmd[1].ll - table[4].ll);
 
   createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1021}\hbox{tid=(0, 6)}\hbox{tid\_old=(0, 4)}\hbox{value='PENDING'}}");
   % See above.
-  xpart (walrecords[2].ul - table[1].ur) = xpart (table[2].ul - walrecords[2].ur);
+  xpart (walrecords[1].ul - table[1].ur) = xpart (table[2].ul - walrecords[1].ur);
 
-  createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1021}}");
-  xpart (walrecords[3].ul - walrecords[2].ur) = objspacing;
+  % createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1021}}");
+  % xpart (walrecords[3].ul - walrecords[2].ur) = objspacing;
 
   % Table 2
   createtable(6, 2);
@@ -109,16 +109,16 @@ beginfig(1);
   table[1].ur + (spacingx, 0) = table[2].ul;
 
   % Transition to table 3.
-  createcmd("\vbox{\hbox{INSERT INTO}\hbox{issues(id, state)}\hbox{VALUES(5, 'NEW');}}");
+  createcmd("heap\_insert(...)");
   xpart(cmd[2].ul - table[2].ur) = xpart(table[3].ul - cmd[2].ur);
   ypart(table[4].ul - cmd[2].ul) = ypart(cmd[2].ll - table[4].ll);
 
   createwalrecord("\vbox{\hbox{INSERT}\vskip1em\hbox{xid=1049}\hbox{tid=(0, 7)}\hbox{value='NEW'}}");
   % See above.
-  xpart (walrecords[4].ul - table[2].ur) = xpart (table[3].ul - walrecords[4].ur);
+  xpart (walrecords[2].ul - table[2].ur) = xpart (table[3].ul - walrecords[2].ur);
 
-  createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1049}}");
-  xpart (walrecords[5].ul - walrecords[4].ur) = objspacing;
+  % createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1049}}");
+  % xpart (walrecords[5].ul - walrecords[4].ur) = objspacing;
 
   % Table 3
   createtable(7, 2);
@@ -184,13 +184,13 @@ beginfig(1);
   table[2].ur + (spacingx, 0) = table[4].ul;
 
   % Label 0.
-  createlabelbig("Turn WAL records into commands and apply them to the new table");
-  label[0].left = (xpart walrecords[0].ul + objspacing, ypart wal.ul + 3objspacing);
+  createlabelbig("Decode WAL and call heap AM API to apply them the new table");
+  label[0].upper = (xpart .5(wal.ll + wal.lr), ypart wal.ll - 2objspacing);
 
   % Label 1.
   createlabelbig("LSN (time)");
   % 'tbborder' above the arrow, see below.
-  label[1].ll = (wal.ul + (objspacing, objspacing + tbborder));
+  label[1].ll = (wal.ll + (objspacing, -2objspacing + tbborder));
   label[1].textonly := true;
 
   finalizetables;
@@ -222,7 +222,7 @@ beginfig(1);
   drawarrow table[4].row[3].right{right}...{left}table[4].row[5].right;
 
   % The direction of LSN. XXX What's the appropriate length of the arrow?
-  drawarrow wal.ul + (objspacing, objspacing)--(xpart walrecords[0].ll, ypart wal.ul + objspacing);
+  drawarrow wal.ll + (objspacing, -2objspacing)--(xpart walrecords[0].ll, ypart wal.ll - 2objspacing);
 
   % Mark the initial WAL position for decoding. It just make sense to align it
   % with the right edge of the first table.
@@ -230,18 +230,23 @@ beginfig(1);
 
   % Draw arrows from the WAL records to the corresponding commands and also
   % arrows to the resulting rows.
-  drawarrow walrecords[0].lower...cmd[0].upper;
+  drawarrow walrecords[0].lower...label[0].ul + (objspacing, 0);
+  drawarrow label[0].ll + (objspacing, 0)...cmd[0].upper;
   drawarrow cmd[0].right{(1, 1)}...{right}table[1].row[0].left;
-  drawarrow walrecords[2].lower...cmd[1].upper;
+
+  drawarrow walrecords[1].lower...label[0].upper;
+  drawarrow label[0].upper...cmd[1].upper;
   drawarrow cmd[1].right{(1, 1)}...{right}table[2].row[3].left;
-  drawarrow walrecords[4].lower...cmd[2].upper;
+
+  drawarrow walrecords[2].lower...label[0].ur - (objspacing, 0);
+  drawarrow label[0].ur - (objspacing, 0)...cmd[2].upper;
   drawarrow cmd[2].right{right}...{right}table[4].row[6].left;
 
   drawlabels;
 
-  drawarrow label[0].lower...walrecords[0].upper;
-  drawarrow label[0].lower...walrecords[2].upper;
-  drawarrow label[0].lower...walrecords[4].upper;
+  % drawarrow label[0].lower...walrecords[0].upper;
+  % drawarrow label[0].lower...walrecords[1].upper;
+  % drawarrow label[0].lower...walrecords[2].upper;
 
   %drawboundingbox;
 endfig;
