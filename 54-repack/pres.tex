@@ -250,11 +250,12 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-        \frametitle{\texttt{pg\_squeeze}}
-%% TODO 1. Disk space requirements, 2. Scheduling, 3. GUC for maximum lock time
-%% (probably not used much)
-\end{frame}
+
+%% TODO 1. Disk space requirements, 2. GUC for maximum lock time (probably not
+%% used much)
+%% \begin{frame}
+%%         \frametitle{\texttt{pg\_squeeze}}
+%\end{frame}
 
 \section{Repacking done right}
 \begin{frame}
@@ -289,11 +290,18 @@
 
 \begin{frame}
   \frametitle{REPACK CONCURRENTLY}
-
   \begin{itemize}
     \item This behaves similar to \texttt{pg\_squeeze}
-    \item similarities are ...?
-    \item differences of note are ...?
+    \item Differences of note are:
+      \begin{itemize}
+        \item Does not unlock the table before requesting the exclusive lock.
+        \item Should not restrict VACUUM of other tables (problem of ``xmin
+          horizon``)
+        \item Should not require {\tt wal\_level=logical}
+        \item No scheduling - do we need that in the core?
+        \item MVCC safety (probably not in PG 19)
+        \item Use background worker for decoding? (probably not in PG 19)
+      \end{itemize}
   \end{itemize}
 
 % TODO (if there's enough time) Explain differences between pg_squeeze and
