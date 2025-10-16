@@ -99,6 +99,63 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Tuples}
+  \includegraphics[height=\sizeforimages\textheight]{tuples.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dead tuples}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{tuples.png}
+    \end{column}
+    \begin{column}{0.8\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{tuples-dead.png}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{VACUUM phase 1: Dead tuples removed}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{tuples-dead.png}
+    \end{column}
+    \begin{column}{0.8\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{tuples-removed.png}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{VACUUM phase 2: Compact table}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{tuples-removed.png}
+
+    \end{column}
+    \begin{column}{0.8\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{tuples-moving.png}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{``Lazy'' vacuum}
+  \begin{itemize}
+    \item But this required ``access exclusive'' lock on the table
+    \item In 2001 (Postgres 7.2), Tom Lane introduces ``lazy vacuum''
+      % commit 4046e58c2478cfcdd4334e2c282b5a42f047ea0b
+    \item Doesn't require access exclusive lock anymore
+    \item Operation can continue
+    \item Disadvantage: surviving tuples cannot be moved across pages
+    \item Old-style vacuum is renamed \texttt{VACUUM FULL}
+  \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
   \frametitle{The problem: table bloat}
   \includegraphics[height=\sizeforimages\textheight]{images/bloat_01.png}
 \end{frame}
@@ -106,6 +163,18 @@
 \begin{frame}
   \frametitle{The problem: table bloat}
   \includegraphics[height=\sizeforimages\textheight]{images/bloat_02.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Faster VACUUM FULL}
+  \begin{itemize}
+    \item In 2010 (Postgres 9.0), VACUUM FULL was changed to use the CLUSTER code
+      % commit 946cf229e89fda779161d707f3ba1f4d3cd024a1
+    \item This code creates new storage and copies all live tuples there
+    \item Then the new storage is removed
+    \item Still requires \emph{access exclusive} lock!
+    \item ... but it's much faster
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
