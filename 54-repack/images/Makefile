@@ -5,6 +5,7 @@ ALLSRCS = bloat_01.mp bloat_02.mp bloat_03.mp \
 	    oracle_01.mp oracle_02.mp \
 	    pg_repack_01.mp pg_repack_02.mp \
 	    pg_squeeze_01.mp pg_squeeze_02.mp pg_squeeze_03.mp \
+	    tuples.mp tuples_dead.mp tuples_moving.mp tuples_removed.mp tuples_compacted.mp \
 	    vacuum_full_01.mp vacuum_full_02.mp
 
 ALLPNGS = $(ALLSRCS:.mp=.png)
