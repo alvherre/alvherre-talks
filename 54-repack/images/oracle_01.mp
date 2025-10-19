@@ -10,34 +10,33 @@ prologues := 3;
 
 beginfig(1);
   % Table 0
-  createtable(4, 2);
-  setcolalignments(r,l);
+  createtable(4, 3);
+  setcolalignments(r,l,r);
   setcolumn(0, 0, "1");
-  setcolumn(0, 1, "NEW");
+  setcolumn(0, 1, "Pear");
+  setcolumn(0, 2, "120");
 
   setcolumn(1, 0, "2");
-  setcolumn(1, 1, "NEW");
+  setcolumn(1, 1, "Macrosaft");
+  setcolumn(1, 2, "988");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "Diviner");
+  setcolumn(2, 2, "543");
 
   setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(3, 1, "Googol");
+  setcolumn(3, 2, "12");
 
   table[0].ll = (0, 0);
 
-  createtable(4, 2);
-  setcolalignments(r,l);
+  createtable(4, 3);
+  setcolalignments(r,l,r);
 
   % Dummy data to achieve "normal" width of the table.
   setcolumn(0, 0, "1");
-  setcolumn(0, 1, "NEW");
-  setcolumn(1, 0, "2");
-  setcolumn(1, 1, "NEW");
-  setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(1, 1, "Macrosaft");
+  setcolumn(1, 2, "988");
 
   table[1].ll = (300, 0);
   table[1].row[0].hidden := true;

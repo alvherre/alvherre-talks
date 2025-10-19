@@ -113,7 +113,8 @@ beginfig(1);
   drawlabel(5);
   drawlabel(6);
   drawlabel(7);
-  % 8 is not there
+  drawlabel(8);
+  drawlabel(9);
   drawlabel(10);
   % 11 is not there.
 

@@ -10,18 +10,17 @@
 \begin{frame}
   \frametitle{Antonín Houska}
 
-  \begin{columns}
+  \begin{columns}[T]
     \begin{column}{0.8\textwidth}
       \begin{itemize}
-	\item Antonín Houska, \href{mailto:ah@cybertec.at}{ah@cybertec.at}
+	\item Antonín Houska, CYBERTEC
+	\item \href{mailto:ah@cybertec.at}{ah@cybertec.at}
 	\item Postgres contributor since 2012
 	\item Working as a Postgres developer for CYBERTEC since 2012
       \end{itemize}
     \end{column}
     \begin{column}{0.2\textwidth}
-      \begin{center}
       \includegraphics[width=0.8\textwidth]{Antonin-Houska-faceshot.jpg}
-      \end{center}
     \end{column}
   \end{columns}
 \end{frame}
@@ -29,18 +28,17 @@
 \begin{frame}
   \frametitle{Álvaro Herrera}
 
-  \begin{columns}
+  \begin{columns}[T]
     \begin{column}{0.8\textwidth}
       \begin{itemize}
-	\item Álvaro Herrera, \href{mailto:alvherre@kurilemu.de}{alvherre@kurilemu.de}
+	\item Álvaro Herrera, EDB
+	\item \href{mailto:alvherre@kurilemu.de}{alvherre@kurilemu.de}
 	\item Postgres contributor since 2002
 	\item Working as a Postgres developer for EDB since 2012
       \end{itemize}
     \end{column}
     \begin{column}{0.2\textwidth}
-      \begin{center}
-	\includegraphics[width=0.8\textwidth]{alvaro-faceshot.jpg}
-      \end{center}
+      \includegraphics[width=0.8\textwidth]{alvaro-faceshot.jpg}
     \end{column}
   \end{columns}
 \end{frame}
@@ -60,8 +58,6 @@
     \item REPACK CONCURRENTLY
   \end{enumerate}
 \end{frame}
-
-\section{Historical review}
 
 \begin{frame}
   \frametitle{Table bloat}
@@ -99,7 +95,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Tuples}
+  \frametitle{How 7.1 and earlier handled vacuuming}
   \includegraphics[height=\sizeforimages\textheight]{images/tuples.png}
 \end{frame}
 
@@ -109,7 +105,7 @@
     \begin{column}{0.5\textwidth}
       \includegraphics[height=\sizeforimages\textheight]{images/tuples.png}
     \end{column}
-    \begin{column}{0.8\textwidth}
+    \begin{column}{0.5\textwidth}
       \includegraphics[height=\sizeforimages\textheight]{images/tuples_dead.png}
     \end{column}
   \end{columns}
@@ -118,34 +114,41 @@
 \begin{frame}
   \frametitle{VACUUM phase 1: Dead tuples removed}
   \begin{columns}
-    \begin{column}{0.5\textwidth}
+    \begin{column}{0.33\textwidth}
       \includegraphics[height=\sizeforimages\textheight]{images/tuples_dead.png}
     \end{column}
-    \begin{column}{0.8\textwidth}
+    \begin{column}{0.33\textwidth}
       \includegraphics[height=\sizeforimages\textheight]{images/tuples_removed.png}
     \end{column}
+
+    \begin{column}{0.33\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{images/tuples_moving.png}
+    \end{column}
+
   \end{columns}
 \end{frame}
 
 \begin{frame}
   \frametitle{VACUUM phase 2: Compact table}
   \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_removed.png}
-
-    \end{column}
-    \begin{column}{0.8\textwidth}
+    \begin{column}{0.33\textwidth}
       \includegraphics[height=\sizeforimages\textheight]{images/tuples_moving.png}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \includegraphics[height=\sizeforimages\textheight]{images/tuples_compacted.png}
     \end{column}
   \end{columns}
 \end{frame}
 
 \begin{frame}
-  \frametitle{``Lazy'' vacuum}
+  \frametitle{``Lazy'' vacuum?}
   \begin{itemize}
     \item But this required ``access exclusive'' lock on the table
-    \item In 2001 (Postgres 7.2), Tom Lane introduces ``lazy vacuum''
-      % commit 4046e58c2478cfcdd4334e2c282b5a42f047ea0b
+    \item {\linksize \href{https://git.postgresql.org/cgit/postgresql.git/commit/?id=4046e58c2478cfcdd4334e2c282b5a42f047ea0b}
+      {Commit 4046e58c2478: \faExternalLink \\
+      Initial implementation of concurrent VACUUM. \\
+      Tom Lane \\
+      Fri Jul 13 2001, Postgres 7.2}}
     \item Doesn't require access exclusive lock anymore
     \item Operation can continue
     \item Disadvantage: surviving tuples cannot be moved across pages
@@ -166,24 +169,29 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Faster VACUUM FULL}
+  \frametitle{A faster VACUUM FULL?}
   \begin{itemize}
+
+    \item Yes! \emph{``Let's use \texttt{CLUSTER},'' someone said}
+    \item {\linksize \href{https://git.postgresql.org/cgit/postgresql.git/commit/?id=946cf229e89fda779161d707f3ba1f4d3cd024a1}
+      {Commit 946cf229e89f: \faExternalLink \\
+      Support rewritten-based full vacuum as VACUUM FULL. Traditional VACUUM FULL was renamed to VACUUM FULL INPLACE. \\
+      Itagaki Takahiro \\
+      Wed Jan 6 2010, Postgres 9.0}}
+
     \item In 2010 (Postgres 9.0), VACUUM FULL was changed to use the CLUSTER code
       % commit 946cf229e89fda779161d707f3ba1f4d3cd024a1
-    \item This code creates new storage and copies all live tuples there
-    \item Then the new storage is removed
-    \item Still requires \emph{access exclusive} lock!
-    \item ... but it's much faster
+    \item How does this work?
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{VACUUM FULL}
+  \frametitle{\texttt{CLUSTER}-based \texttt{VACUUM FULL}}
   \includegraphics[height=\sizeforimages\textheight]{images/vacuum_full_01.png}
 \end{frame}
 
 \begin{frame}
-  \frametitle{VACUUM FULL}
+  \frametitle{\texttt{CLUSTER}-based \texttt{VACUUM FULL}}
   \includegraphics[height=\sizeforimages\textheight]{images/vacuum_full_02.png}
 \end{frame}
 
@@ -213,6 +221,21 @@
   \begin{center}
     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_04.png}
   \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{VACUUM FULL INPLACE} removed}
+  \begin{itemize}
+    \item {\linksize \href{https://git.postgresql.org/cgit/postgresql.git/commit/?id=0a469c87692d15a22eaa69d4b3a43dd8e278dd64}
+      {Commit 0a469c87692d: \faExternalLink \\
+      Remove old-style VACUUM FULL (which was known for a little while as
+      VACUUM FULL INPLACE), along with a boatload of subsidiary code and complexity.
+      Per discussion, the use case for this method of vacuuming is no longer large
+      enough to justify maintaining it; not to mention that we don't wish to invest
+      the work that would be needed to make it play nicely with Hot Standby. \\
+      Tom Lane \\
+      Mon Feb 8 2010, Postgres 9.0}}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -261,16 +284,14 @@
 \begin{frame}
   \frametitle{\texttt{pg\_repack}'s algorithm}
   \begin{itemize}
-    \item Like VACUUM FULL / CLUSTER it removes the bloat by copying the
-      useful data to a new table, swaps the files and drops the new
+    \item Like \texttt{VACUUM FULL}, it removes bloat by copying the
+      useful data to a new table, swaps underlying files and drops the new
       table.
     \item Exclusive lock is held during the swap, but possibly a bit longer if
-      the database is too busy.
-    \item Data changes done by applications during the copying are captured by
-      triggers and written to a ``log table''. They are applied right before
-      the swap. (After the initial copying and rebuild of indexes has
-      completed.)
-      %% TODO Does this line fit to this slide, or should one slide be added?
+      the database is very busy.
+    \item Data changes done by applications during the copy are captured by
+      triggers and written to a ``log table'';
+      applied after the initial copying and index rebuild, right before the swap.
     \item Multiple backends can be launched to rebuild indexes
   \end{itemize}
 \end{frame}
@@ -279,9 +300,14 @@
   \frametitle{\texttt{pg\_squeeze}}
   \begin{itemize}
     \item Started in 2016 (PostgreSQL 9.5)
-    \item The idea was to use background worker to launch \texttt{pg\_repack} automatically
-    \item \texttt{pg\_repack} is implemented both on server and client side --
-      not really suitable for background worker
+    \item Initial motivation: allow \texttt{pg\_repack} to be scheduled without external tools
+    \item Use of dual client/server implementation made this difficult
+    \item Realization: better to reimplement everything with modern technology
+      \begin{itemize}
+	\item background workers (instead of a client application)
+	\item logical decoding (instead of triggers)
+      \end{itemize}
+    \item End result: a complete reimplementation
   \end{itemize}
 \end{frame}
 
@@ -326,7 +352,6 @@
 %%         \frametitle{\texttt{pg\_squeeze}}
 %\end{frame}
 
-\section{Repacking done right}
 \begin{frame}
   \frametitle{The REPACK command}
   \begin{itemize}
@@ -341,9 +366,9 @@
     \item single-table \texttt{vacuum full}: \\
       \texttt{REPACK (ANALYZE) customers;}
     \item single-table \texttt{cluster}: \\
-      \texttt{REPACK (ANALYZE) customers USING INDEX cust\_pkey;}
+      \texttt{REPACK (ANALYZE, VERBOSE) customers USING INDEX cust\_pkey;}
     \item single-table \texttt{cluster} using the stored index: \\
-      \texttt{REPACK (ANALYZE) customers USING INDEX;}
+      \texttt{REPACK customers USING INDEX;}
   \end{itemize}
 \end{frame}
 
@@ -357,21 +382,38 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{REPACK CONCURRENTLY}
+\begin{frame}[fragile]
+  \frametitle{Concurrent \texttt{REPACK}}
+  \begin{lstlisting}
+REPACK (ANALYZE, CONCURRENTLY) customers USING INDEX tenant_idx;
+
+REPACK (CONCURRENTLY) orders;
+
+REPACK (CONCURRENTLY) USING INDEX;
+  \end{lstlisting}
   \begin{itemize}
     \item This behaves similar to \texttt{pg\_squeeze}
-    \item Differences of note are:
+    \item Differences of note:
       \begin{itemize}
-        \item Does not unlock the table before requesting the exclusive lock.
-        \item Should not restrict VACUUM of other tables (problem of ``xmin
-          horizon``)
-        \item Should not require {\tt wal\_level=logical}
-        \item No scheduling - do we need that in the core?
-        \item MVCC safety (probably not in PG 19)
-        \item Use background worker for decoding? (probably not in PG 19)
+	\item Does not unlock the table before requesting the exclusive lock.
+	\item No scheduling -- do we need that in core?
       \end{itemize}
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Concurrent REPACK (2)}
+
+  Advantages over \texttt{pg\_squeeze}:
+
+  \begin{itemize}
+    \item Should not require {\tt wal\_level=logical}
+    \item MVCC safety (hopefully in PG 19)
+    \item Should not restrict VACUUM of other tables (problem of ``xmin
+      horizon``)
+  \end{itemize}
+
+\end{frame}
 
 % TODO (if there's enough time) Explain differences between pg_squeeze and
 % REPACK CONCURRENTLY.
@@ -404,14 +446,11 @@
     \includegraphics[height=\sizeforimages\textheight]{repackdb.png}
 \end{frame}
 
-\section{Future work}
-
 \begin{frame}
   \frametitle{Future work}
   \begin{itemize}
     \item allow to enable logical decoding on the fly
     \item use a background worker for logical decoding
-    \item MVCC safety?
     \item Better control over repacking multiple tables?
   \end{itemize}
 \end{frame}

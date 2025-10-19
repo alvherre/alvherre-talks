@@ -10,33 +10,41 @@ prologues := 3;
 
 beginfig(1);
   % Table 0
-  createtable(4, 2);
-  setcolalignments(r,l);
+  createtable(4, 3);
+  setcolalignments(r,l,r);
   setcolumn(0, 0, "1");
-  setcolumn(0, 1, "REJECTED");
+  setcolumn(0, 1, "Pear");
+  setcolumn(0, 2, "150");
 
   setcolumn(1, 0, "2");
-  setcolumn(1, 1, "PENDING");
+  setcolumn(1, 1, "Macrosaft");
+  setcolumn(1, 2, "1024");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "Diviner");
+  setcolumn(2, 2, "543");
 
   setcolumn(3, 0, "4");
-  setcolumn(3, 1, "RESOLVED");
+  setcolumn(3, 1, "Googol");
+  setcolumn(3, 2, "99");
 
   table[0].row[0].highlighted := true;
   table[0].row[1].highlighted := true;
   table[0].row[3].highlighted := true;
   table[0].ll = (0, 0);
 
-  createtable(4, 2);
-  setcolalignments(r,l);
+  createtable(4, 3);
+  setcolalignments(r,l,r);
   setcolumn(0, 0, "1");
-  setcolumn(0, 1, "NEW     ");
+  setcolumn(0, 1, "Pear");
+  setcolumn(0, 2, "120");
   setcolumn(1, 0, "2");
-  setcolumn(1, 1, "NEW");
+  setcolumn(1, 1, "Macrosaft");
+  setcolumn(1, 2, "988");
   setcolumn(2, 0, "4");
-  setcolumn(2, 1, "NEW");
+  setcolumn(2, 1, "Googol");
+  setcolumn(2, 2, "12");
+
   % Dummy data to adjust the table width.
   setcolumn(3, 0, "4");
   setcolumn(3, 1, "RESOLVED");
