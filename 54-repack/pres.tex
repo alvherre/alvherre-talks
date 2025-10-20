@@ -304,10 +304,13 @@
     \item Use of dual client/server implementation made this difficult
     \item Realization: better to reimplement everything with modern technology
       \begin{itemize}
-	\item background workers (instead of a client application)
+	\item background worker for scheduling (requires server-only code)
 	\item logical decoding (instead of triggers)
+        \item binary data rather than text
+        \item server API rather than SQL commands
       \end{itemize}
-    \item End result: a complete reimplementation
+    %% This might not be wrong but it does not fit on the page.
+    %\item End result: a complete reimplementation
   \end{itemize}
 \end{frame}
 
@@ -335,16 +338,10 @@
 \begin{frame}
   \frametitle{\texttt{pg\_squeeze}}
   \begin{itemize}
-    \item Use logical decoding (introduced in PostgreSQL 9.4) rather than
-      triggers.
-    \item Use server API rather than SQL commands to manipulate tables,
-      indexes and data.
-    \item Work with binary data rather then text.
     \item cron-like scheduling. Squeeze table if the portion of bloat exceeded
       threshold specified by the DBA.
   \end{itemize}
 \end{frame}
-
 
 %% TODO 1. Disk space requirements, 2. GUC for maximum lock time (probably not
 %% used much)
