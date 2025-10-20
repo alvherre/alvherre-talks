@@ -1,6 +1,6 @@
 input TEX;
 input "metapostgres/common";
-input "metapostgres/repack";
+input "metapostgres/table";
 
 % Hack to produce higher-resolution PNGs
 hppp := 0.2;

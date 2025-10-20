@@ -1,6 +1,6 @@
 input TEX;
 input "metapostgres/common";
-input "metapostgres/repack";
+input "metapostgres/table";
 
 hppp := 0.2;
 vppp := 0.2;
