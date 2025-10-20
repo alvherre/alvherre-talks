@@ -139,7 +139,7 @@ beginfig(1);
   ypart label[1].ur = ypart table[3].lr - objspacing;
 
   % Table 4 (the "log table")
-  createtable(3, 2);
+  createtable(2, 2);
   setheader(0, "pk");
   setheader(1, "row");
   setcolalignments(r,l);
@@ -148,9 +148,6 @@ beginfig(1);
 
   setcolumn(1, 0, "4");
   setcolumn(1, 1, "ROW(4, 'PENDING')");
-
-  setcolumn(2, 0, "");
-  setcolumn(2, 1, "ROW(5, 'NEW')");
 
   % Horizontally, the log table is in the middle.
   xpart (table[4].ul - table[0].ll) = xpart (table[3].lr - table[4].ur);
@@ -233,27 +230,33 @@ beginfig(1);
   label[4].textonly := true;
   % The arrow will start in the Lower left corner of the picture (see below),
   % so the label is shifted by 'tbborder' upwards.
-  label[4].ll = ((xpart table[5].ll, ypart table[8].lr) + (0, tbborder));
+  label[4].ll = ((xpart table[5].ll, ypart table[7].lr) + (0, tbborder));
 
   finalizetables;
   finalizecmds;
   finalizelabels;
 
-  initboundingbox((xpart label[2].left, ypart table[8].ll))((table[3].ur + (objspacing, 0)));
+  initboundingbox((xpart label[2].left, ypart table[7].ll))((table[2].ur + (objspacing, 0)));
   computescalefactor(metapg.bbox);
 
   adjustpens;
   fixpicturewidth;
 
-  drawtables;
+  % The original version had more tables. Renumbering would be difficult, so
+  % only draw the tables we need now and do other minor adjustments.
+  drawtable(0);
+  drawtable(1);
+  drawtable(2);
+  drawtable(4);
+  drawtable(5);
+  drawtable(6);
+  drawtable(7);
 
   pickup arrowpen;
   % Draw arrows from the old tuple versions to the new ones.
   drawarrow table[1].row[0].right{(1, -1)}...{(-1, -1)}table[1].row[4].right;
   drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[4].right;
   drawarrow table[2].row[3].right{right}...{left}table[2].row[5].right;
-  drawarrow table[3].row[0].right{(1, -1)}...{(-1, -1)}table[3].row[4].right;
-  drawarrow table[3].row[3].right{right}...{left}table[3].row[5].right;
 
   % Show the initial copy.
   drawarrow table[0].lower...(xpart table[0].lower, ypart label[0].upper);
@@ -266,10 +269,10 @@ beginfig(1);
   drawarrow table[2].row[5].lower{(-1, -1)}...{(-1, -1)}label[1].upper;
   drawarrow label[1].lower{(4, -.3)}...{(-3, -.5)}table[4].row[1].right;
 
-  drawarrow table[3].row[6].lower{(-3, -1)}...{(-3, -1)}label[1].upper + (3objspacing, 0);
-  drawarrow label[1].lower + (3objspacing, 0){(4, -1)}...{(-4, -1)}table[4].row[2].right;
+  % Draw individual commands, like with tables.
+  drawcmd(0);
+  drawcmd(1);
 
-  drawcmds;
   drawlabels;
 
   % Arrows from each SQL command to the resulting row as well as to the
@@ -281,10 +284,8 @@ beginfig(1);
 
   drawarrow cmd[1].right{right}...{right}table[2].row[3].left;
 
-  drawarrow cmd[2].right{right}...{right}table[3].row[6].left;
-
   % The direction of time. XXX What's the appropriate length of the arrow?
-  drawarrow (xpart table[5].ll, ypart table[8].lr)--(xpart table[5].ll, ypart table[8].lr) + (5objspacing, 0);
+  drawarrow (xpart table[5].ll, ypart table[7].lr)--(xpart table[5].ll, ypart table[7].lr) + (5objspacing, 0);
 
   drawboundingboxwhite;
 endfig;

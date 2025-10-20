@@ -96,9 +96,6 @@ beginfig(1);
 
   % Table 2
   createtable(6, 2);
-  % This table is only a placeholder now.
-  table[2].hidden := true;
-
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "NEW");
@@ -118,8 +115,8 @@ beginfig(1);
   setcolumn(5, 0, "4");
   setcolumn(5, 1, "PENDING");
 
-  %table[2].row[0].highlighted := true;
-  %table[2].row[3].highlighted := true;
+  table[2].row[4].highlighted := true;
+  table[2].row[5].highlighted := true;
   table[1].ur + (spacingx, 0) = table[2].ul;
 
   % Transition to table 3.
@@ -127,14 +124,12 @@ beginfig(1);
   xpart(cmd[2].ul - table[2].ur) = xpart(table[3].ul - cmd[2].ur);
   ypart(table[3].ul - cmd[2].ul) = ypart(cmd[2].ll - table[3].ll);
 
-  createwalrecord("\vbox{\hbox{INSERT}\vskip1em\hbox{xid=1049}\hbox{tid=(0, 7)}\hbox{value='NEW'}}");
-  % See above.
-  xpart (walrecords[2].ul - table[2].ur) = xpart (table[3].ul - walrecords[2].ur);
-
   % createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1049}}");
   % xpart (walrecords[5].ul - walrecords[4].ur) = objspacing;
 
   % Table 3
+  %
+  % Note: not used anymore, but I didn't want to perform renumbering.
   createtable(7, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
@@ -204,23 +199,26 @@ beginfig(1);
 
   finalizelabels;
 
-  % Table 3 is the longest one, so the vertical position of the WAL rectangle
+  % Table 2 is the longest one, so the vertical position of the WAL rectangle
   % must be controlled by this one.
-  wal.ul = (xpart table[0].ll, ypart table[3].lr) - (0, objspacing);
-  wal.ur = table[3].lr - (0, objspacing);
+  wal.ul = (xpart table[0].ll, ypart table[2].lr) - (0, objspacing);
+  wal.ur = table[2].lr - (0, objspacing);
 
-  initboundingbox(table[4].ll)(table[3].ur + (objspacing, 0));
+  initboundingbox(table[4].ll)(table[2].ur + (objspacing, 0));
   computescalefactor(metapg.bbox);
 
   adjustpens;
   fixpicturewidth;
 
-  drawtables;
+  % The original version had more tables. Renumbering would be difficult, so
+  % only draw the tables we need now and do other minor adjustments.
+  drawtable(2);
+  drawtable(4);
 
   pickup arrowpen;
   % Draw arrows from the old tuple versions to the new ones.
-  drawarrow table[3].row[0].right{(1, -1)}...{(-1, -1)}table[3].row[4].right;
-  drawarrow table[3].row[3].right{right}...{left}table[3].row[5].right;
+  drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[4].right;
+  drawarrow table[2].row[3].right{right}...{left}table[2].row[5].right;
 
   drawwal;
 
@@ -233,25 +231,24 @@ beginfig(1);
 
   % Label is not used here because it does not fit into a single line.
   descr[0] := TEX (setfntstrdescr &
-      "\vbox{\hbox{Logical decoding starts here}\vskip1em\hbox{The initial snapshot does not see the effects of the transactions committed after this point}}");
+      "\vbox{\hbox{Logical decoding starts here}\vskip1em\hbox{The initial snapshot does not see the effects}\hbox{of the transactions committed after this point}}");
   descr[0].shift := table[0].lr;
   draw descr[0] shifted descr[0].shift;
   % Arrow pointing to the WAL start position.
   drawarrow (table[0].lr - (0, objspacing))--((xpart table[0].lr, ypart wal.ul) + (0, objspacing));
   % Arrows pointing to the tuples not visible to the initial snapshots.
-  drawarrow (lrcorner descr[0] + descr[0].shift)--table[3].row[4].left;
-  drawarrow (lrcorner descr[0] + descr[0].shift)--table[3].row[5].left;
-  drawarrow (lrcorner descr[0] + descr[0].shift)--table[3].row[6].left;
+  drawarrow (lrcorner descr[0] + descr[0].shift)--table[2].row[4].left;
+  drawarrow (lrcorner descr[0] + descr[0].shift)--table[2].row[5].left;
 
   drawlabels;
 
   % Arrow from the "scan label" to the old table.
-  drawarrow (xpart table[3].lower, ypart label[0].ur)--table[3].lower;
+  drawarrow (xpart table[2].lower, ypart label[0].ur)--table[2].lower;
   % Arrow from the scan to the insert.
   drawarrow label[0].left--label[1].right;
   % Arrow from the insert to the new table.
   drawarrow label[1].left{left}...{down}table[4].upper;
 
-  %drawboundingbox;
+  drawboundingboxwhite;
 endfig;
 end

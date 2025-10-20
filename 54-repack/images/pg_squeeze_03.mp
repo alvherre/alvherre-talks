@@ -39,16 +39,11 @@ beginfig(1);
   % the table.
   xpart(cmd[0].ul - table[0].ur) = xpart(table[1].ul - cmd[0].ur);
   % Vertical position is in the middle of the longest table.
-  ypart(table[4].ul - cmd[0].ul) = ypart(cmd[0].ll - table[4].ll);
+  ypart(table[2].ul - cmd[0].ul) = ypart(cmd[0].ll - table[2].ll);
 
   createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1011}\hbox{tid=(0, 5)}\hbox{tid\_old=(0, 1)}\hbox{value='REJECTED'}}");
   % Horizontally, the WAL records are located between the table versions.
   xpart (walrecords[0].ul - table[0].ur) = xpart (table[1].ul - walrecords[0].ur);
-
-  %createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1011}}");
-  % The commit records are related to the DML ones, so use the minimum space
-  % to separate them.
-  %xpart (walrecords[1].ul - walrecords[0].ur) = objspacing;
 
   % Table 1
   createtable(5, 2);
@@ -74,14 +69,11 @@ beginfig(1);
   % Transition to table 2.
   createcmd("heap\_update(...)");
   xpart(cmd[1].ul - table[1].ur) = xpart(table[2].ul - cmd[1].ur);
-  ypart(table[4].ul - cmd[1].ul) = ypart(cmd[1].ll - table[4].ll);
+  ypart(table[2].ul - cmd[1].ul) = ypart(cmd[1].ll - table[2].ll);
 
   createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1021}\hbox{tid=(0, 6)}\hbox{tid\_old=(0, 4)}\hbox{value='PENDING'}}");
   % See above.
   xpart (walrecords[1].ul - table[1].ur) = xpart (table[2].ul - walrecords[1].ur);
-
-  % createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1021}}");
-  % xpart (walrecords[3].ul - walrecords[2].ur) = objspacing;
 
   % Table 2
   createtable(6, 2);
@@ -104,24 +96,13 @@ beginfig(1);
   setcolumn(5, 0, "4");
   setcolumn(5, 1, "PENDING");
 
+  % Highlight the rows not visible to the initial snapshot.
   table[2].row[4].highlighted := true;
   table[2].row[5].highlighted := true;
   table[1].ur + (spacingx, 0) = table[2].ul;
 
-  % Transition to table 3.
-  createcmd("heap\_insert(...)");
-  xpart(cmd[2].ul - table[2].ur) = xpart(table[3].ul - cmd[2].ur);
-  ypart(table[4].ul - cmd[2].ul) = ypart(cmd[2].ll - table[4].ll);
-
-  createwalrecord("\vbox{\hbox{INSERT}\vskip1em\hbox{xid=1049}\hbox{tid=(0, 7)}\hbox{value='NEW'}}");
-  % See above.
-  xpart (walrecords[2].ul - table[2].ur) = xpart (table[3].ul - walrecords[2].ur);
-
-  % createwalrecord("\vbox{\hbox{COMMIT}\vskip1em\hbox{xid=1049}}");
-  % xpart (walrecords[5].ul - walrecords[4].ur) = objspacing;
-
-  % Table 3
-  createtable(7, 2);
+  % Table 3 - above table 2.
+  createtable(6, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "NEW");
@@ -141,45 +122,10 @@ beginfig(1);
   setcolumn(5, 0, "4");
   setcolumn(5, 1, "PENDING");
 
-  setcolumn(6, 0, "5");
-  setcolumn(6, 1, "NEW");
-
-  % Highlight the rows not visible to the initial snapshot.
   table[3].row[4].highlighted := true;
   table[3].row[5].highlighted := true;
-  table[3].row[6].highlighted := true;
 
-  % Table 3 is above the WAL rectangle, so we can only use xpart of table 2.
-  xpart table[2].ur + spacingx = xpart table[3].ul;
-  %table[2].ur + (spacingx, 0) = table[3].ul;
-
-  % Table 4 - identical to table 3.
-  createtable(7, 2);
-  setcolalignments(r,l);
-  setcolumn(0, 0, "1");
-  setcolumn(0, 1, "NEW");
-
-  setcolumn(1, 0, "2");
-  setcolumn(1, 1, "RESOLVED");
-
-  setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
-
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
-
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
-
-  setcolumn(5, 0, "4");
-  setcolumn(5, 1, "PENDING");
-
-  setcolumn(6, 0, "5");
-  setcolumn(6, 1, "NEW");
-
-  table[4].row[4].highlighted := true;
-  table[4].row[5].highlighted := true;
-  table[4].row[6].highlighted := true;
+  xpart table[2].right = xpart table[3].right;
 
   table[2].ur + (spacingx, 0) = table[4].ul;
 
@@ -190,7 +136,7 @@ beginfig(1);
   % Label 1.
   createlabelbig("LSN (time)");
   % 'tbborder' above the arrow, see below.
-  label[1].ll = (wal.ll + (objspacing, -2objspacing + tbborder));
+  label[1].ll = (wal.ul + (objspacing, objspacing + tbborder));
   label[1].textonly := true;
 
   finalizetables;
@@ -202,13 +148,19 @@ beginfig(1);
   % must be controlled by this one.
   wal.ur = table[3].lr - (0, objspacing);
 
-  initboundingbox((xpart table[0].ll, ypart table[4].ll))(table[3].ur + (objspacing, 0));
+  initboundingbox((xpart table[0].ll, ypart table[2].ll))(table[3].ur + (objspacing, 0));
   computescalefactor(metapg.bbox);
 
   adjustpens;
   fixpicturewidth;
 
-  drawtables;
+  % The original version had more tables. Renumbering would be difficult, so
+  % only draw the tables we need now and do other minor adjustments.
+  drawtable(0);
+  drawtable(1);
+  drawtable(2);
+  drawtable(3);
+
   drawwal;
   drawcmds;
   drawlabels;
@@ -218,36 +170,26 @@ beginfig(1);
   drawarrow table[1].row[0].right{(1, -1)}...{(-1, -1)}table[1].row[4].right;
   drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[4].right;
   drawarrow table[2].row[3].right{right}...{left}table[2].row[5].right;
-  drawarrow table[4].row[0].right{(1, -1)}...{(-1, -1)}table[4].row[4].right;
-  drawarrow table[4].row[3].right{right}...{left}table[4].row[5].right;
+  % drawarrow table[4].row[0].right{(1, -1)}...{(-1, -1)}table[4].row[4].right;
+  % drawarrow table[4].row[3].right{right}...{left}table[4].row[5].right;
 
   % The direction of LSN. XXX What's the appropriate length of the arrow?
-  drawarrow wal.ll + (objspacing, -2objspacing)--(xpart walrecords[0].ll, ypart wal.ll - 2objspacing);
+  drawarrow wal.ul + (objspacing, objspacing)--(xpart walrecords[0].ll, ypart wal.ul + objspacing);
 
   % Mark the initial WAL position for decoding. It just make sense to align it
   % with the right edge of the first table.
-  draw (xpart table[0].lr, ypart wal.ul)--(xpart table[0].lr, ypart wal.ll);
+  %draw (xpart table[0].lr, ypart wal.ul)--(xpart table[0].lr, ypart wal.ll);
 
   % Draw arrows from the WAL records to the corresponding commands and also
   % arrows to the resulting rows.
-  drawarrow walrecords[0].lower...label[0].ul + (objspacing, 0);
-  drawarrow label[0].ll + (objspacing, 0)...cmd[0].upper;
+  drawarrow walrecords[0].lower...(xpart walrecords[0].lower, ypart label[0].upper);
+  drawarrow (xpart walrecords[0].lower, ypart label[0].lower)...cmd[0].upper;
   drawarrow cmd[0].right{(1, 1)}...{right}table[1].row[0].left;
 
-  drawarrow walrecords[1].lower...label[0].upper;
-  drawarrow label[0].upper...cmd[1].upper;
-  drawarrow cmd[1].right{(1, 1)}...{right}table[2].row[3].left;
+  drawarrow walrecords[1].lower...(xpart walrecords[1].lower, ypart label[0].upper);
+  drawarrow (xpart walrecords[1].lower, ypart label[0].lower)...cmd[1].upper;
+  drawarrow cmd[1].right{(1, 1)}...{right}table[2].row[0].left;
 
-  drawarrow walrecords[2].lower...label[0].ur - (objspacing, 0);
-  drawarrow label[0].ur - (objspacing, 0)...cmd[2].upper;
-  drawarrow cmd[2].right{right}...{right}table[4].row[6].left;
-
-  drawlabels;
-
-  % drawarrow label[0].lower...walrecords[0].upper;
-  % drawarrow label[0].lower...walrecords[1].upper;
-  % drawarrow label[0].lower...walrecords[2].upper;
-
-  %drawboundingbox;
+  drawboundingboxwhite;
 endfig;
 end

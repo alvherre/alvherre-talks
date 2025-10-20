@@ -15,7 +15,7 @@ beginfig(1);
   spacingx := 7objspacing;
 
   % Table 0 (the "log table")
-  createtable(3, 2);
+  createtable(2, 2);
   setheader(0, "pk");
   setheader(1, "row");
   setcolalignments(r,l);
@@ -24,9 +24,6 @@ beginfig(1);
 
   setcolumn(1, 0, "4");
   setcolumn(1, 1, "ROW(4, 'PENDING')");
-
-  setcolumn(2, 0, "");
-  setcolumn(2, 1, "ROW(5, 'NEW')");
 
   table[0].ll = (0, 0);
 
@@ -148,7 +145,7 @@ beginfig(1);
   label[0].textonly := true;
   % The arrow will start in the Lower left corner of the picture (see below),
   % so the label is shifted by 'tbborder' upwards.
-  label[0].ll = ((xpart table[0].ll, ypart table[4].lr) + (0, tbborder));
+  label[0].ll = ((xpart table[0].ll, ypart table[3].lr) + (0, tbborder));
 
   % Label 1.
   createlabelbig("New table loaded");
@@ -162,45 +159,50 @@ beginfig(1);
 
   % Label 3.
   createlabelbig("Data changes are applied to the new table");
-  xpart label[3].right = xpart table[4].right;
+  xpart label[3].right = xpart table[3].right;
   ypart label[3].left = ypart table[0].left;
   label[3].textonly := true;
 
   finalizelabels;
 
   % TODO Adjust
-  initboundingbox((xpart table[0].ll, ypart table[4].ll))((xpart table[4].ur + objspacing, ypart table[0].ul));
+  initboundingbox((xpart table[0].ll, ypart table[3].ll))((xpart table[3].ur + objspacing, ypart table[0].ul));
   computescalefactor(metapg.bbox);
 
   adjustpens;
   fixpicturewidth;
 
-  drawtables;
-  drawcmds;
+  % The original version had more tables. Renumbering would be difficult, so
+  % only draw the tables we need now and do other minor adjustments.
+  drawtable(0);
+  drawtable(1);
+  drawtable(2);
+  drawtable(3);
+
+  % Like above.
+  drawcmd(0);
+  drawcmd(1);
+
   drawlabels;
 
   pickup arrowpen;
 
   % Time
-  drawarrow (xpart table[0].ll, ypart table[4].lr)--(xpart table[0].ll, ypart table[4].lr) + (5objspacing, 0);
+  drawarrow (xpart table[0].ll, ypart table[3].lr)--(xpart table[0].ll, ypart table[3].lr) + (5objspacing, 0);
 
   % Arrows from the log table rows to the commands.
   drawarrow table[0].row[0].right{right}...{down}cmd[0].upper;
   drawarrow table[0].row[1].right{right}...{down}cmd[1].upper;
-  drawarrow table[0].row[2].right{right}...{down}cmd[2].upper;
 
   % Arrows from the SQL commands to the rows affected.
   drawarrow cmd[0].right{(1, 1)}...{right}table[2].row[0].left;
   drawarrow cmd[1].right{right}...{right}table[3].row[3].left;
-  drawarrow cmd[2].right{right}...{right}table[4].row[6].left;
 
   % Arrows from the old tuple versions to the new ones.
   drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[4].right;
   drawarrow table[3].row[0].right{(1, -1)}...{(-1, -1)}table[3].row[4].right;
   drawarrow table[3].row[3].right{right}...{left}table[3].row[5].right;
-  drawarrow table[4].row[0].right{(1, -1)}...{(-1, -1)}table[4].row[4].right;
-  drawarrow table[4].row[3].right{right}...{left}table[4].row[5].right;
 
-  %drawboundingbox;
+  drawboundingboxwhite;
 endfig;
 end
