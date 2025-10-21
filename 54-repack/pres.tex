@@ -79,7 +79,7 @@
   \frametitle{Table bloat: other databases}
   \includegraphics[width=\sizeforimages\textwidth]{images/oracle_02.png}
 
-  As the table is updated, the old versions are moved to the rollback segment. The table doesn't need later cleanup
+  As the table is updated, old tuples versions are moved to the rollback segment. The table doesn't need later cleanup.
 \end{frame}
 
 \begin{frame}
@@ -407,10 +407,14 @@ REPACK (CONCURRENTLY) USING INDEX;
   Advantages over \texttt{pg\_squeeze}:
 
   \begin{itemize}
-    \item Should not require {\tt wal\_level=logical}
-    \item MVCC safety (hopefully in PG 19)
+      % This is not yet implemented I think, so let's mention it in
+      % "Future work"
+%    \item Should not require {\tt wal\_level=logical}
     \item Should not restrict VACUUM of other tables (problem of ``xmin
       horizon``)
+    \item MVCC safety (hopefully in PG 19)
+    \item Fully integrated in core
+    \begin{itemize} \item Very easy to use \end{itemize}
   \end{itemize}
 
 \end{frame}
@@ -452,5 +456,14 @@ REPACK (CONCURRENTLY) USING INDEX;
     \item allow to enable logical decoding on the fly
     \item use a background worker for logical decoding
     \item Better control over repacking multiple tables?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Call to Action!}
+
+  \begin{itemize}
+    \item First things first: how do you like this?
+    \item Test the patch! \href{https://commitfest.postgresql.org/patch/5117/}{https://commitfest.postgresql.org/patch/5117/}
   \end{itemize}
 \end{frame}
