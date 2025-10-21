@@ -18,6 +18,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage[export]{adjustbox} % https://texblog.org/2014/02/20/figure-with-border-in-latex/
 \usepackage[normalem]{ulem}
+\usepackage{relsize}
+
+% make links blue
+\hypersetup{
+    colorlinks = true,
+    urlcolor   = blue,
+}
 
 \let\checkmark\undefined  % dingbat defines this, but it's already been defined previously. wtf.
 \usepackage{dingbat} % WARNING -- hacked up!
@@ -97,7 +104,7 @@ Riga, Latvia \\
 basicstyle=\footnotesize\ttfamily,keywordstyle=\bfseries\color{green!40!black},%
 columns=fullflexible, keepspaces, upquote,
 escapeinside={\%*}{*)},
-morekeywords={with, merge, returning},
+morekeywords={with, merge, returning, repack},
 deletekeywords={YEAR},
 showspaces=false,showstringspaces=false,
 literate={á}{{\'{a}}}{1}

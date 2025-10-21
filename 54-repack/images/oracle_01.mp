@@ -30,6 +30,11 @@ beginfig(1);
 
   table[0].ll = (0, 0);
 
+  createlabelbig("table: companies");
+  %label[0].ll = table[0].row[0].left + (0, objspacing);
+  label[0].lower = table[0].upper + (0, 0.5objspacing);
+  label[0].textonly := true;
+
   createtable(4, 3);
   setcolalignments(r,l,r);
 
@@ -45,9 +50,9 @@ beginfig(1);
   table[1].row[3].hidden := true;
 
   createlabelbig("Rollback segment");
-  %label[0].ll = table[1].row[0].left + (0, objspacing);
-  label[0].lower = table[1].upper + (0, objspacing);
-  label[0].textonly := true;
+  %label[1].ll = table[1].row[0].left + (0, objspacing);
+  label[1].lower = table[1].upper + (0, 0.5objspacing);
+  label[1].textonly := true;
 
   finalizetables;
 
@@ -64,7 +69,7 @@ beginfig(1);
   %   ((xpart label[0].right,
   % 	ypart table[0].ur) + (table[0].right - table[0].lr));
 
-  initboundingbox(table[0].ll)(label[0].ur);
+  initboundingbox(table[0].ll)(label[1].ur);
   computescalefactor(metapg.bbox);
 
   adjustpens;

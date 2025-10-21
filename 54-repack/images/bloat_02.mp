@@ -54,10 +54,6 @@ beginfig(1);
   label[1].ll := table[0].row[2].right + (5objspacing, -1objspacing);
   label[1].textonly := true;
 
-  createlabelbig("This technique is called ``lazy vacuum''");
-  label[2].ll := table[0].row[6].right + (6objspacing, 0);
-  label[2].textonly := true;
-
   finalizelabels;
 
   % Add space corresponding to half of the table height both above and below

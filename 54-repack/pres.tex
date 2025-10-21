@@ -14,7 +14,7 @@
     \begin{column}{0.8\textwidth}
       \begin{itemize}
 	\item Antonín Houska, CYBERTEC
-	\item \href{mailto:ah@cybertec.at}{ah@cybertec.at}
+	\item \href{mailto:ah@cybertec.at}{\color{black}{ah@cybertec.at}}
 	\item Postgres contributor since 2012
 	\item Working as a Postgres developer for CYBERTEC since 2012
       \end{itemize}
@@ -32,7 +32,7 @@
     \begin{column}{0.8\textwidth}
       \begin{itemize}
 	\item Álvaro Herrera, EDB
-	\item \href{mailto:alvherre@kurilemu.de}{alvherre@kurilemu.de}
+	\item \href{mailto:alvherre@kurilemu.de}{\color{black}{alvherre@kurilemu.de}}
 	\item Postgres contributor since 2002
 	\item Working as a Postgres developer for EDB since 2012
       \end{itemize}
@@ -195,33 +195,33 @@
   \includegraphics[height=\sizeforimages\textheight]{images/vacuum_full_02.png}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Exclusive lock is needed}
-  \begin{center}
-    \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_01.png}
-  \end{center}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Exclusive lock is needed}
-  \begin{center}
-    \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_02.png}
-  \end{center}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Exclusive lock is needed}
-  \begin{center}
-    \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_03.png}
-  \end{center}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Exclusive lock is needed}
-  \begin{center}
-    \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_04.png}
-  \end{center}
-\end{frame}
+% \begin{frame}
+%   \frametitle{Exclusive lock is needed}
+%   \begin{center}
+%     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_01.png}
+%   \end{center}
+% \end{frame}
+% 
+% \begin{frame}
+%   \frametitle{Exclusive lock is needed}
+%   \begin{center}
+%     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_02.png}
+%   \end{center}
+% \end{frame}
+% 
+% \begin{frame}
+%   \frametitle{Exclusive lock is needed}
+%   \begin{center}
+%     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_03.png}
+%   \end{center}
+% \end{frame}
+% 
+% \begin{frame}
+%   \frametitle{Exclusive lock is needed}
+%   \begin{center}
+%     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_04.png}
+%   \end{center}
+% \end{frame}
 
 \begin{frame}
   \frametitle{\texttt{VACUUM FULL INPLACE} removed}
@@ -304,13 +304,14 @@
     \item Use of dual client/server implementation made this difficult
     \item Realization: better to reimplement everything with modern technology
       \begin{itemize}
+	  \relscale{0.8}
 	\item background worker for scheduling (requires server-only code)
 	\item logical decoding (instead of triggers)
         \item binary data rather than text
         \item server API rather than SQL commands
       \end{itemize}
     %% This might not be wrong but it does not fit on the page.
-    %\item End result: a complete reimplementation
+    \item End result: a complete reimplementation
   \end{itemize}
 \end{frame}
 
@@ -357,25 +358,35 @@
   \includegraphics[width=\textwidth]{repack.png}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Single-table \texttt{REPACK} forms}
   \begin{itemize}
-    \item single-table \texttt{vacuum full}: \\
-      \texttt{REPACK (ANALYZE) customers;}
-    \item single-table \texttt{cluster}: \\
-      \texttt{REPACK (ANALYZE, VERBOSE) customers USING INDEX cust\_pkey;}
-    \item single-table \texttt{cluster} using the stored index: \\
-      \texttt{REPACK customers USING INDEX;}
+    \item single-table \texttt{vacuum full}:
+      \begin{lstlisting}
+REPACK (ANALYZE) customers;
+      \end{lstlisting}
+    \item single-table \texttt{cluster}:
+      \begin{lstlisting}
+REPACK (ANALYZE, VERBOSE) customers USING INDEX cust_pkey;
+      \end{lstlisting}
+    \item single-table \texttt{cluster} using the stored index:
+      \begin{lstlisting}
+REPACK customers USING INDEX;
+      \end{lstlisting}
   \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Full-database \texttt{REPACK} forms}
   \begin{itemize}
-    \item whole-database \texttt{VACUUM FULL}: \\
-      \texttt{REPACK;}
-    \item whole-database \texttt{CLUSTER}: \\
-      \texttt{REPACK USING INDEX;}
+    \item whole-database \texttt{VACUUM FULL}:
+      \begin{lstlisting}
+REPACK;
+      \end{lstlisting}
+    \item whole-database \texttt{CLUSTER}:
+      \begin{lstlisting}
+REPACK USING INDEX;
+      \end{lstlisting}
   \end{itemize}
 \end{frame}
 
@@ -452,7 +463,7 @@ REPACK (CONCURRENTLY) USING INDEX;
   \begin{itemize}
     \item allow to enable logical decoding on the fly
     \item use a background worker for logical decoding
-    \item Better control over repacking multiple tables?
+    \item Better control over repacking multiple tables
   \end{itemize}
 \end{frame}
 
@@ -460,7 +471,7 @@ REPACK (CONCURRENTLY) USING INDEX;
   \frametitle{Call to Action!}
 
   \begin{itemize}
-    \item First things first: how do you like this?
+    \item First things first: do you like \texttt{REPACK}?
     \item Test the patch! \href{https://commitfest.postgresql.org/patch/5117/}{https://commitfest.postgresql.org/patch/5117/}
   \end{itemize}
 \end{frame}
