@@ -50,11 +50,31 @@ beginfig(1);
   label[5].ul = label[4].ll - (0, objspacing);
   label[5].notext := true;
 
+  % A bunch of invisible labels for pages 2 and 3
+  createlabel("xxxxxxxxxxxx");
+  label[6].ul = label[5].ll - (0, objspacing);
+  label[6].notext := true;
+  createlabel("xxxxxxxxxxxx");
+  label[7].ul = label[6].ll - (0, objspacing);
+  label[7].notext := true;
+  createlabel("xxxxxxxxxxxx");
+  label[8].ul = label[7].ll - (0, objspacing);
+  label[8].notext := true;
+  createlabel("xxxxxxxxxxxx");
+  label[9].ul = label[8].ll - (0, objspacing);
+  label[9].notext := true;
+  createlabel("xxxxxxxxxxxx");
+  label[10].ul = label[9].ll - (0, objspacing);
+  label[10].notext := true;
+  createlabel("xxxxxxxxxxxx");
+  label[11].ul = label[10].ll - (0, objspacing);
+  label[11].notext := true;
+
   finalizelabels;
 
   rightborder := 3objspacing;
 
-  initboundingbox(label[5].ll - (objspacing, objspacing))
+  initboundingbox(label[11].ll - (objspacing, objspacing))
     (label[0].ur + (objspacing + rightborder, objspacing));
   computescalefactor(metapg.bbox);
 
