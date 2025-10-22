@@ -341,6 +341,7 @@
   \begin{itemize}
     \item cron-like scheduling. Squeeze table if the portion of bloat exceeded
       threshold specified by the DBA.
+    \item Can move tables and indexes to different tablespaces.
   \end{itemize}
 \end{frame}
 
@@ -424,7 +425,6 @@ REPACK (CONCURRENTLY) USING INDEX;
     \item Fully integrated in core
     \begin{itemize} \item Very easy to use \end{itemize}
   \end{itemize}
-
 \end{frame}
 
 % TODO (if there's enough time) Explain differences between pg_squeeze and
@@ -464,6 +464,9 @@ REPACK (CONCURRENTLY) USING INDEX;
     \item allow to enable logical decoding on the fly
     \item use a background worker for logical decoding
     \item Better control over repacking multiple tables
+    \item Allow tables/indexes to move tablespace
+    \item Migrate table to another table AM (zheap, OrioleDB, ...)
+    \item Modify \texttt{ALTER TABLE} to rewrite tables using \texttt{REPACK} (?)
   \end{itemize}
 \end{frame}
 
