@@ -15,7 +15,7 @@ beginfig(1);
   spacingx := 7objspacing;
 
   % Table 0
-  createtable(4, 2);
+  createtable(3, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "NEW");
@@ -24,10 +24,7 @@ beginfig(1);
   setcolumn(1, 1, "RESOLVED");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
-
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(2, 1, "NEW");
 
   table[0].ll = (0, 0);
 
@@ -40,6 +37,29 @@ beginfig(1);
   ypart(table[3].ul - cmd[0].ul) = ypart(cmd[0].ll - table[3].ll);
 
   % Table 1
+  createtable(4, 2);
+  setcolalignments(r,l);
+  setcolumn(0, 0, "1");
+  setcolumn(0, 1, "NEW");
+
+  setcolumn(1, 0, "2");
+  setcolumn(1, 1, "RESOLVED");
+
+  setcolumn(2, 0, "3");
+  setcolumn(2, 1, "NEW");
+
+  setcolumn(3, 0, "1");
+  setcolumn(3, 1, "REJECTED");
+
+  table[1].row[3].highlighted := true;
+  table[0].ur + (spacingx, 0) = table[1].ul;
+
+  % Transition to table 2.
+  createcmd("\vbox{\hbox{UPDATE issues}\hbox{SET state='PENDING'}\hbox{WHERE id=4;}}");
+  xpart(cmd[1].ul - table[1].ur) = xpart(table[2].ul - cmd[1].ur);
+  ypart(table[3].ul - cmd[1].ul) = ypart(cmd[1].ll - table[3].ll);
+
+  % Table 2
   createtable(5, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
@@ -49,45 +69,16 @@ beginfig(1);
   setcolumn(1, 1, "RESOLVED");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "NEW");
 
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(3, 0, "1");
+  setcolumn(3, 1, "REJECTED");
 
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
+  setcolumn(4, 0, "3");
+  setcolumn(4, 1, "PENDING");
 
-  table[1].row[4].highlighted := true;
-  table[0].ur + (spacingx, 0) = table[1].ul;
-
-  % Transition to table 2.
-  createcmd("\vbox{\hbox{UPDATE issues}\hbox{SET state='PENDING'}\hbox{WHERE id=4;}}");
-  xpart(cmd[1].ul - table[1].ur) = xpart(table[2].ul - cmd[1].ur);
-  ypart(table[3].ul - cmd[1].ul) = ypart(cmd[1].ll - table[3].ll);
-
-  % Table 2
-  createtable(6, 2);
-  setcolalignments(r,l);
-  setcolumn(0, 0, "1");
-  setcolumn(0, 1, "NEW");
-
-  setcolumn(1, 0, "2");
-  setcolumn(1, 1, "RESOLVED");
-
-  setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
-
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
-
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
-
-  setcolumn(5, 0, "4");
-  setcolumn(5, 1, "PENDING");
-
+  table[2].row[3].highlighted := true;
   table[2].row[4].highlighted := true;
-  table[2].row[5].highlighted := true;
   table[1].ur + (spacingx, 0) = table[2].ul;
 
   % Transition to table 3.
@@ -95,7 +86,7 @@ beginfig(1);
   xpart(cmd[2].ul - table[2].ur) = xpart(table[3].ul - cmd[2].ur);
   ypart(table[3].ul - cmd[2].ul) = ypart(cmd[2].ll - table[3].ll);
 
-  % Table 3
+  % Table 3 - Not used ATM.
   createtable(7, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
@@ -136,7 +127,7 @@ beginfig(1);
   % Horizontally centered.
   xpart label[1].ul - xpart table[0].ll = xpart table[3].lr - xpart label[1].ur;
   % Vertically below the longest table in the upper part (table 3).
-  ypart label[1].ur = ypart table[3].lr - objspacing;
+  ypart label[1].ur = ypart table[2].lr - objspacing;
 
   % Table 4 (the "log table")
   createtable(2, 2);
@@ -146,8 +137,8 @@ beginfig(1);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "ROW(1, 'REJECTED')");
 
-  setcolumn(1, 0, "4");
-  setcolumn(1, 1, "ROW(4, 'PENDING')");
+  setcolumn(1, 0, "3");
+  setcolumn(1, 1, "ROW(3, 'PENDING')");
 
   % Horizontally, the log table is in the middle.
   xpart (table[4].ul - table[0].ll) = xpart (table[3].lr - table[4].ur);
@@ -186,7 +177,7 @@ beginfig(1);
   setcolumn(1, 0, "2");
   setcolumn(1, 1, "RESOLVED");
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "NEW");
 
   % Horizontally aligned with table 2.
   xpart table[7].ul = xpart table[2].ll;
@@ -254,20 +245,20 @@ beginfig(1);
 
   pickup arrowpen;
   % Draw arrows from the old tuple versions to the new ones.
-  drawarrow table[1].row[0].right{(1, -1)}...{(-1, -1)}table[1].row[4].right;
-  drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[4].right;
-  drawarrow table[2].row[3].right{right}...{left}table[2].row[5].right;
+  drawarrow table[1].row[0].right{(1, -1)}...{(-1, -1)}table[1].row[3].right;
+  drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[3].right;
+  drawarrow table[2].row[2].right{right}...{left}table[2].row[4].right;
 
   % Show the initial copy.
   drawarrow table[0].lower...(xpart table[0].lower, ypart label[0].upper);
   drawarrow (xpart table[0].lower, ypart label[0].lower)...table[5].upper;
 
   % Arrows from the new tuples to the log table (via trigger).
-  drawarrow table[1].row[4].lower{down}...{down}label[1].upper - (3objspacing, 0);
+  drawarrow table[1].row[3].lower{down}...{down}label[1].upper - (3objspacing, 0);
   drawarrow label[1].lower - (3objspacing, 0){(-4, -1)}...{(4, -1)}table[4].row[0].left;
 
-  drawarrow table[2].row[5].lower{(-1, -1)}...{(-1, -1)}label[1].upper;
-  drawarrow label[1].lower{(4, -.3)}...{(-3, -.5)}table[4].row[1].right;
+  drawarrow table[2].row[4].lower{down}...{down}label[1].upper + (3objspacing, 0);
+  drawarrow label[1].lower + (3objspacing, 0){(4, -.3)}...{(-3, -.5)}table[4].row[1].right;
 
   % Draw individual commands, like with tables.
   drawcmd(0);
@@ -280,9 +271,9 @@ beginfig(1);
   % have been called, we should not do it before filling the rectangles
   % (because that would overwrite parts of the arrows).
   pickup arrowpen;
-  drawarrow cmd[0].right{(1, 1)}...{right}table[1].row[0].left;
+  drawarrow cmd[0].right{(1, 1)}...{(2, 1)}table[1].row[0].left;
 
-  drawarrow cmd[1].right{right}...{right}table[2].row[3].left;
+  drawarrow cmd[1].right{right}...{right}table[2].row[2].left;
 
   % The direction of time. XXX What's the appropriate length of the arrow?
   drawarrow (xpart table[5].ll, ypart table[7].lr)--(xpart table[5].ll, ypart table[7].lr) + (5objspacing, 0);

@@ -15,7 +15,7 @@ beginfig(1);
   spacingx := 7objspacing;
 
   % Table 0
-  createtable(4, 2);
+  createtable(3, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "NEW");
@@ -24,10 +24,7 @@ beginfig(1);
   setcolumn(1, 1, "RESOLVED");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
-
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(2, 1, "NEW");
 
   % In this picture, most of the tables are depicted below the WAL area.
   table[0].ll = (0, 0);
@@ -41,11 +38,38 @@ beginfig(1);
   % Vertical position is in the middle of the longest table.
   ypart(table[2].ul - cmd[0].ul) = ypart(cmd[0].ll - table[2].ll);
 
-  createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1011}\hbox{tid=(0, 5)}\hbox{tid\_old=(0, 1)}\hbox{value='REJECTED'}}");
+  createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1011}\hbox{tid=(0, 4)}\hbox{tid\_old=(0, 1)}\hbox{value='REJECTED'}}");
   % Horizontally, the WAL records are located between the table versions.
   xpart (walrecords[0].ul - table[0].ur) = xpart (table[1].ul - walrecords[0].ur);
 
   % Table 1
+  createtable(4, 2);
+  setcolalignments(r,l);
+  setcolumn(0, 0, "1");
+  setcolumn(0, 1, "NEW");
+
+  setcolumn(1, 0, "2");
+  setcolumn(1, 1, "RESOLVED");
+
+  setcolumn(2, 0, "3")
+  setcolumn(2, 1, "NEW");
+
+  setcolumn(3, 0, "1");
+  setcolumn(3, 1, "REJECTED");
+
+  table[1].row[3].highlighted := true;
+  table[0].ur + (spacingx, 0) = table[1].ul;
+
+  % Transition to table 2.
+  createcmd("heap\_update(...)");
+  xpart(cmd[1].ul - table[1].ur) = xpart(table[2].ul - cmd[1].ur);
+  ypart(table[2].ul - cmd[1].ul) = ypart(cmd[1].ll - table[2].ll);
+
+  createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1021}\hbox{tid=(0, 5)}\hbox{tid\_old=(0, 3)}\hbox{value='PENDING'}}");
+  % See above.
+  xpart (walrecords[1].ul - table[1].ur) = xpart (table[2].ul - walrecords[1].ur);
+
+  % Table 2
   createtable(5, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
@@ -55,54 +79,21 @@ beginfig(1);
   setcolumn(1, 1, "RESOLVED");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "NEW");
 
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(3, 0, "1");
+  setcolumn(3, 1, "REJECTED");
 
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
-
-  table[1].row[4].highlighted := true;
-  table[0].ur + (spacingx, 0) = table[1].ul;
-
-  % Transition to table 2.
-  createcmd("heap\_update(...)");
-  xpart(cmd[1].ul - table[1].ur) = xpart(table[2].ul - cmd[1].ur);
-  ypart(table[2].ul - cmd[1].ul) = ypart(cmd[1].ll - table[2].ll);
-
-  createwalrecord("\vbox{\hbox{UPDATE}\vskip1em\hbox{xid=1021}\hbox{tid=(0, 6)}\hbox{tid\_old=(0, 4)}\hbox{value='PENDING'}}");
-  % See above.
-  xpart (walrecords[1].ul - table[1].ur) = xpart (table[2].ul - walrecords[1].ur);
-
-  % Table 2
-  createtable(6, 2);
-  setcolalignments(r,l);
-  setcolumn(0, 0, "1");
-  setcolumn(0, 1, "NEW");
-
-  setcolumn(1, 0, "2");
-  setcolumn(1, 1, "RESOLVED");
-
-  setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
-
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
-
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
-
-  setcolumn(5, 0, "4");
-  setcolumn(5, 1, "PENDING");
+  setcolumn(4, 0, "3");
+  setcolumn(4, 1, "PENDING");
 
   % Highlight the rows not visible to the initial snapshot.
+  table[2].row[3].highlighted := true;
   table[2].row[4].highlighted := true;
-  table[2].row[5].highlighted := true;
   table[1].ur + (spacingx, 0) = table[2].ul;
 
   % Table 3 - above table 2.
-  createtable(6, 2);
+  createtable(5, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "NEW");
@@ -111,19 +102,16 @@ beginfig(1);
   setcolumn(1, 1, "RESOLVED");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "NEW");
 
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(3, 0, "1");
+  setcolumn(3, 1, "REJECTED");
 
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
+  setcolumn(4, 0, "3");
+  setcolumn(4, 1, "PENDING");
 
-  setcolumn(5, 0, "4");
-  setcolumn(5, 1, "PENDING");
-
+  table[3].row[3].highlighted := true;
   table[3].row[4].highlighted := true;
-  table[3].row[5].highlighted := true;
 
   xpart table[2].right = xpart table[3].right;
 
@@ -167,9 +155,9 @@ beginfig(1);
 
   pickup arrowpen;
   % Draw arrows from the old tuple versions to the new ones.
-  drawarrow table[1].row[0].right{(1, -1)}...{(-1, -1)}table[1].row[4].right;
-  drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[4].right;
-  drawarrow table[2].row[3].right{right}...{left}table[2].row[5].right;
+  drawarrow table[1].row[0].right{(1, -1)}...{(-1, -1)}table[1].row[3].right;
+  drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[3].right;
+  drawarrow table[2].row[2].right{right}...{left}table[2].row[4].right;
   % drawarrow table[4].row[0].right{(1, -1)}...{(-1, -1)}table[4].row[4].right;
   % drawarrow table[4].row[3].right{right}...{left}table[4].row[5].right;
 
@@ -188,7 +176,7 @@ beginfig(1);
 
   drawarrow walrecords[1].lower...(xpart walrecords[1].lower, ypart label[0].upper);
   drawarrow (xpart walrecords[1].lower, ypart label[0].lower)...cmd[1].upper;
-  drawarrow cmd[1].right{(1, 1)}...{right}table[2].row[0].left;
+  drawarrow cmd[1].right{(1, 1)}...{right}table[2].row[2].left;
 
   drawboundingboxwhite;
 endfig;

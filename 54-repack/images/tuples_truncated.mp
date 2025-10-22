@@ -14,7 +14,7 @@ labelbgcolor := hexrgbcolor("EE")("CC")("66");
 
 color	color_save, color_dead;
 
-color_dead := hexrgbcolor("66")("99")("CC");
+color_dead := hexrgbcolor("00")("00")("00");
 
 beginfig(1);
   path	page[];
@@ -50,39 +50,11 @@ beginfig(1);
   label[5].ul = label[4].ll - (0, objspacing);
   label[5].notext := true;
 
-  % Page 2
-  createlabel("xxxxxxxxxxxx");
-  label[6].ul = label[5].ll - (0, objspacing);
-  label[6].notext := true;
-
-  createlabel("xxxxxxxxxxxx");
-  label[7].ul = label[6].ll - (0, objspacing);
-  label[7].notext := true;
-
-  % Hide this completely - just a placeholder.
-  createlabel("xxxxxxxxxxxx");
-  label[8].ul = label[7].ll - (0, objspacing);
-  label[8].notext := true;
-
-  % Page 3
-  createlabel("xxxxxxxxxxxx");
-  label[9].ul = label[8].ll - (0, objspacing);
-  label[9].notext := true;
-
-  createlabel("xxxxxxxxxxxx");
-  label[10].ul = label[9].ll - (0, objspacing);
-  label[10].notext := true;
-
-  % Hide this completely - just a placeholder.
-  createlabel("xxxxxxxxxxxx");
-  label[11].ul = label[10].ll - (0, objspacing);
-  label[11].notext := true;
-
   finalizelabels;
 
   rightborder := 3objspacing;
 
-  initboundingbox(label[11].ll - (objspacing, objspacing))
+  initboundingbox(label[5].ll - (objspacing, objspacing))
     (label[0].ur + (objspacing + rightborder, objspacing));
   computescalefactor(metapg.bbox);
 
@@ -106,40 +78,13 @@ beginfig(1);
   draw page[1];
   fill page[1] withcolor tablebgcolor;
 
-  page[2] := label[6].ul + (-.5objspacing, .5objspacing)--
-    label[8].ll + (-.5objspacing, -.5objspacing) --
-    label[8].lr + (.5objspacing + rightborder, -.5objspacing) --
-    label[6].ur + (.5objspacing + rightborder, .5objspacing) -- cycle;
-  draw page[2];
-  fill page[2] withcolor tablebgcolor;
-
-  page[3] := label[9].ul + (-.5objspacing, .5objspacing)--
-    label[11].ll + (-.5objspacing, -.5objspacing) --
-    label[11].lr + (.5objspacing + rightborder, -.5objspacing) --
-    label[9].ur + (.5objspacing + rightborder, .5objspacing) -- cycle;
-  draw page[3];
-  fill page[3] withcolor tablebgcolor;
-
   % Draw the tuples.
   drawlabel(0);
-  color_save := labelbgcolor;
-  labelbgcolor := color_dead;
+
   drawlabel(1);
   drawlabel(2);
   drawlabel(3);
-  labelbgcolor := color_save;
   drawlabel(4);
-  color_save := labelbgcolor;
-  labelbgcolor := color_dead;
-  drawlabel(5);
-  labelbgcolor := color_save;
-  drawlabel(6);
-  drawlabel(7);
-  % 8 is not there
-  drawlabel(9);
-  labelbgcolor := color_dead;
-  drawlabel(10);
-  % 11 is not there.
 
   % Make sure the picture does contain the bounding box. Without that, the
   % picture contents might be scaled too much, as if there was no bounding

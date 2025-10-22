@@ -22,13 +22,13 @@ beginfig(1);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "ROW(1, 'REJECTED')");
 
-  setcolumn(1, 0, "4");
-  setcolumn(1, 1, "ROW(4, 'PENDING')");
+  setcolumn(1, 0, "3");
+  setcolumn(1, 1, "ROW(3, 'PENDING')");
 
   table[0].ll = (0, 0);
 
   % Table 1 - the new table, now loaded.
-  createtable(4, 2);
+  createtable(3, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
   setcolumn(0, 1, "NEW");
@@ -37,12 +37,9 @@ beginfig(1);
   setcolumn(1, 1, "RESOLVED");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "NEW");
 
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
-
-  table[1].ul + (0, 7objspacing) = table[0].ll;
+  table[1].ul + (0, 5objspacing) = table[0].ll;
 
   % Transition to table 2.
   createcmd("\vbox{\hbox{UPDATE issues}\hbox{SET state='REJECTED'}\hbox{WHERE id=1;}}");
@@ -53,6 +50,29 @@ beginfig(1);
   ypart(table[3].ul - cmd[0].ul) = ypart(cmd[0].ll - table[3].ll);
 
   % Table 2 - the new table with one change applied.
+  createtable(4, 2);
+  setcolalignments(r,l);
+  setcolumn(0, 0, "1");
+  setcolumn(0, 1, "NEW");
+
+  setcolumn(1, 0, "2");
+  setcolumn(1, 1, "RESOLVED");
+
+  setcolumn(2, 0, "3");
+  setcolumn(2, 1, "NEW");
+
+  setcolumn(3, 0, "1");
+  setcolumn(3, 1, "REJECTED");
+
+  table[2].row[3].highlighted := true;
+  table[1].ur + (spacingx, 0) = table[2].ul;
+
+  % Transition to table 3.
+  createcmd("\vbox{\hbox{UPDATE issues}\hbox{SET state='PENDING'}\hbox{WHERE id=3;}}");
+  xpart(cmd[1].ul - table[2].ur) = xpart(table[3].ul - cmd[1].ur);
+  ypart(table[3].ul - cmd[1].ul) = ypart(cmd[1].ll - table[3].ll);
+
+  % Table 3 - the new table with two changes applied.
   createtable(5, 2);
   setcolalignments(r,l);
   setcolumn(0, 0, "1");
@@ -62,45 +82,16 @@ beginfig(1);
   setcolumn(1, 1, "RESOLVED");
 
   setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
+  setcolumn(2, 1, "NEW");
 
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
+  setcolumn(3, 0, "1");
+  setcolumn(3, 1, "REJECTED");
 
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
+  setcolumn(4, 0, "3");
+  setcolumn(4, 1, "PENDING");
 
-  table[2].row[4].highlighted := true;
-  table[1].ur + (spacingx, 0) = table[2].ul;
-
-  % Transition to table 3.
-  createcmd("\vbox{\hbox{UPDATE issues}\hbox{SET state='PENDING'}\hbox{WHERE id=4;}}");
-  xpart(cmd[1].ul - table[2].ur) = xpart(table[3].ul - cmd[1].ur);
-  ypart(table[3].ul - cmd[1].ul) = ypart(cmd[1].ll - table[3].ll);
-
-  % Table 3 - the new table with two changes applied.
-  createtable(6, 2);
-  setcolalignments(r,l);
-  setcolumn(0, 0, "1");
-  setcolumn(0, 1, "NEW");
-
-  setcolumn(1, 0, "2");
-  setcolumn(1, 1, "RESOLVED");
-
-  setcolumn(2, 0, "3");
-  setcolumn(2, 1, "RESOLVED");
-
-  setcolumn(3, 0, "4");
-  setcolumn(3, 1, "NEW");
-
-  setcolumn(4, 0, "1");
-  setcolumn(4, 1, "REJECTED");
-
-  setcolumn(5, 0, "4");
-  setcolumn(5, 1, "PENDING");
-
+  table[3].row[3].highlighted := true;
   table[3].row[4].highlighted := true;
-  table[3].row[5].highlighted := true;
   table[2].ur + (spacingx, 0) = table[3].ul;
 
   % Transition to table 4.
@@ -196,12 +187,12 @@ beginfig(1);
 
   % Arrows from the SQL commands to the rows affected.
   drawarrow cmd[0].right{(1, 1)}...{right}table[2].row[0].left;
-  drawarrow cmd[1].right{right}...{right}table[3].row[3].left;
+  drawarrow cmd[1].right{right}...{right}table[3].row[2].left;
 
   % Arrows from the old tuple versions to the new ones.
-  drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[4].right;
-  drawarrow table[3].row[0].right{(1, -1)}...{(-1, -1)}table[3].row[4].right;
-  drawarrow table[3].row[3].right{right}...{left}table[3].row[5].right;
+  drawarrow table[2].row[0].right{(1, -1)}...{(-1, -1)}table[2].row[3].right;
+  drawarrow table[3].row[0].right{(1, -1)}...{(-1, -1)}table[3].row[3].right;
+  drawarrow table[3].row[2].right{right}...{left}table[3].row[4].right;
 
   drawboundingboxwhite;
 endfig;
