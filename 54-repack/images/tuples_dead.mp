@@ -27,6 +27,7 @@ beginfig(1);
   % text (e.g. "DEAD TUPLE") if needed.
   createlabel("xxxxxxxxxxxx");
   label[0].ll = (0, 0);
+  label[0].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[1].ul = label[0].ll - (0, objspacing);
@@ -40,6 +41,7 @@ beginfig(1);
 
   createlabel("xxxxxxxxxxxx");
   label[4].ul = label[3].ll - (0, objspacing);
+  label[4].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[5].ul = label[4].ll - (0, objspacing);
@@ -47,9 +49,11 @@ beginfig(1);
   % Page 2
   createlabel("xxxxxxxxxxxx");
   label[6].ul = label[5].ll - (0, objspacing);
+  label[6].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[7].ul = label[6].ll - (0, objspacing);
+  label[7].notext := true;
 
   % Hide this completely - just a placeholder.
   createlabel("xxxxxxxxxxxx");
@@ -58,6 +62,7 @@ beginfig(1);
   % Page 3
   createlabel("xxxxxxxxxxxx");
   label[9].ul = label[8].ll - (0, objspacing);
+  label[9].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[10].ul = label[9].ll - (0, objspacing);

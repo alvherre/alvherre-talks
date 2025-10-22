@@ -27,57 +27,72 @@ beginfig(1);
   % text (e.g. "DEAD TUPLE") if needed.
   createlabel("xxxxxxxxxxxx");
   label[0].ll = (0, 0);
+  label[0].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[1].ul = label[0].ll - (0, objspacing);
+  label[1].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[2].ul = label[1].ll - (0, objspacing);
+  label[2].notext := true;
 
   % Page 1
   createlabel("xxxxxxxxxxxx");
   label[3].ul = label[2].ll - (0, objspacing);
+  label[3].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[4].ul = label[3].ll - (0, objspacing);
+  label[4].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[5].ul = label[4].ll - (0, objspacing);
+  label[5].notext := true;
 
   % Page 2
   createlabel("xxxxxxxxxxxx");
   label[6].ul = label[5].ll - (0, objspacing);
+  label[6].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[7].ul = label[6].ll - (0, objspacing);
+  label[7].notext := true;
 
   % Hide this completely - just a placeholder.
   createlabel("xxxxxxxxxxxx");
   label[8].ul = label[7].ll - (0, objspacing);
+  label[8].notext := true;
 
   % Page 3
   createlabel("xxxxxxxxxxxx");
   label[9].ul = label[8].ll - (0, objspacing);
+  label[9].notext := true;
 
   createlabel("xxxxxxxxxxxx");
   label[10].ul = label[9].ll - (0, objspacing);
+  label[10].notext := true;
 
   % Hide this completely - just a placeholder.
   createlabel("xxxxxxxxxxxx");
   label[11].ul = label[10].ll - (0, objspacing);
+  label[11].notext := true;
 
   % Descriptions of the arrows (that we draw below).
   createlabelbig("1");
   label[12].textonly := true;
   label[12].ll = label[8].lr + (2objspacing, 0);
+  label[12].notext := true;
 
   createlabelbig("2");
   label[13].textonly := true;
   label[13].ll = label[7].lr + (objspacing, .7objspacing);
+  label[13].notext := true;
 
   createlabelbig("3");
   label[14].textonly := true;
   label[14].ll = label[5].ur;
+  label[14].notext := true;
 
   finalizelabels;
 
