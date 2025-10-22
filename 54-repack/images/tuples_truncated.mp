@@ -72,7 +72,7 @@ beginfig(1);
 
   finalizelabels;
 
-  rightborder := 3objspacing;
+  rightborder := objspacing;
 
   initboundingbox(label[11].ll - (objspacing, objspacing))
     (label[0].ur + (objspacing + rightborder, objspacing));

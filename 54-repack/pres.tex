@@ -94,54 +94,64 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{How 7.1 and earlier handled vacuuming}
-  \includegraphics[height=\sizeforimages\textheight]{images/tuples.png}
-\end{frame}
+% \begin{frame}
+%   \frametitle{How 7.1 and earlier handled vacuuming}
+%   \begin{columns}
+%     \begin{column}{0.33\textwidth}
+%       \includegraphics[height=\sizeforimages\textheight]{images/tuples.png}
+%     \end{column}
+%     \begin{column}{0.33\textwidth}
+%       \includegraphics[height=\sizeforimages\textheight]{images/tuples_dead.png}
+%     \end{column}
+%   \end{columns}
+% \end{frame}
 
 \begin{frame}
-  \frametitle{Dead tuples}
+  \frametitle{Berkeley: Ancient vacuuming technique}
   \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples.png}
+    \begin{column}{0.20\textwidth}
+      \includegraphics[height=0.7\textheight]{images/tuples_dead.png} \\
+      \relscale{0.5}
+      some dead tuples
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_dead.png}
+    \begin{column}{0.20\textwidth}
+      \includegraphics[height=0.7\textheight]{images/tuples_removed.png} \\
+      \relscale{0.5}
+      dead tuples are removed
     \end{column}
+    \begin{column}{0.20\textwidth}
+      \includegraphics[height=0.7\textheight]{images/tuples_moving.png} \\
+      \relscale{0.5}
+      tuples moved to final locations
+    \end{column}
+    \begin{column}{0.20\textwidth}
+      \includegraphics[height=0.7\textheight]{images/tuples_compacted.png} \\
+      \relscale{0.5}
+      tuples in final locations
+    \end{column}
+    \begin{column}{0.20\textwidth}
+      \includegraphics[height=0.7\textheight]{images/tuples_truncated.png} \\
+      \relscale{0.5}
+      table can be truncated
+    \end{column}
+
   \end{columns}
 \end{frame}
 
-\begin{frame}
-  \frametitle{VACUUM phase 1: Dead tuples removed}
-  \begin{columns}
-    \begin{column}{0.33\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_dead.png}
-    \end{column}
-    \begin{column}{0.33\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_removed.png}
-    \end{column}
-
-    \begin{column}{0.33\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_moving.png}
-    \end{column}
-
-  \end{columns}
-\end{frame}
-
-\begin{frame}
-  \frametitle{VACUUM phase 2: Compact table}
-  \begin{columns}
-    \begin{column}{0.33\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_moving.png}
-    \end{column}
-    \begin{column}{0.33\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_compacted.png}
-    \end{column}
-    \begin{column}{0.33\textwidth}
-      \includegraphics[height=\sizeforimages\textheight]{images/tuples_truncated.png}
-    \end{column}
-  \end{columns}
-\end{frame}
+% \begin{frame}
+%   \frametitle{Vacuum phase 2: Compact table}
+%   \begin{columns}
+%     \begin{column}{0.33\textwidth}
+%       \includegraphics[height=\sizeforimages\textheight]{images/tuples_moving.png}
+%     \end{column}
+%     \begin{column}{0.33\textwidth}
+%       \includegraphics[height=\sizeforimages\textheight]{images/tuples_compacted.png}
+%     \end{column}
+%     \begin{column}{0.33\textwidth}
+%       \includegraphics[height=\sizeforimages\textheight]{images/tuples_truncated.png}
+%     \end{column}
+%   \end{columns}
+% \end{frame}
 
 \begin{frame}
   \frametitle{``Lazy'' vacuum?}
@@ -159,17 +169,15 @@
   \end{itemize}
 \end{frame}
 
-
-
-\begin{frame}
-  \frametitle{The problem: table bloat}
-  \includegraphics[height=\sizeforimages\textheight]{images/bloat_01.png}
-\end{frame}
-
-\begin{frame}
-  \frametitle{The problem: table bloat}
-  \includegraphics[height=\sizeforimages\textheight]{images/bloat_02.png}
-\end{frame}
+% \begin{frame}
+%   \frametitle{The problem: table bloat}
+%   \includegraphics[height=\sizeforimages\textheight]{images/bloat_01.png}
+% \end{frame}
+%
+% \begin{frame}
+%   \frametitle{The problem: table bloat}
+%   \includegraphics[height=\sizeforimages\textheight]{images/bloat_02.png}
+% \end{frame}
 
 \begin{frame}
   \frametitle{A faster VACUUM FULL?}
@@ -204,21 +212,21 @@
 %     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_01.png}
 %   \end{center}
 % \end{frame}
-% 
+%
 % \begin{frame}
 %   \frametitle{Exclusive lock is needed}
 %   \begin{center}
 %     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_02.png}
 %   \end{center}
 % \end{frame}
-% 
+%
 % \begin{frame}
 %   \frametitle{Exclusive lock is needed}
 %   \begin{center}
 %     \includegraphics[height=\sizeforimages\textheight]{images/exclusive_lock_needed_03.png}
 %   \end{center}
 % \end{frame}
-% 
+%
 % \begin{frame}
 %   \frametitle{Exclusive lock is needed}
 %   \begin{center}

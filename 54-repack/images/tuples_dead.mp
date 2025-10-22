@@ -80,7 +80,7 @@ beginfig(1);
 
   finalizelabels;
 
-  rightborder := 3objspacing;
+  rightborder := objspacing;
 
   initboundingbox(label[11].ll - (objspacing, objspacing))
     (label[0].ur + (objspacing + rightborder, objspacing));
@@ -135,7 +135,10 @@ beginfig(1);
   labelbgcolor := color_save;
   drawlabel(6);
   drawlabel(7);
-  % 8 is not there
+  color_save := labelbgcolor;
+  labelbgcolor := color_dead;
+  drawlabel(8);
+  labelbgcolor := color_save;
   drawlabel(9);
   labelbgcolor := color_dead;
   drawlabel(10);
