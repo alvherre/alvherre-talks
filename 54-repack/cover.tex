@@ -49,19 +49,7 @@
 \setbeamercolor{structure}{fg=bluecoal}
 \setbeamercolor{palette primary}{fg=goldleaf}
 
-% https://tex.stackexchange.com/questions/673635/beamer-section-title-slides
-\setbeamertemplate{section page}
-{
-  \begingroup
-    \centering
-%    {\usebeamerfont{section name}\usebeamercolor[fg]{section name}\sectionname~\insertsectionnumber}
-    \vskip1em\par
-    \begin{beamercolorbox}[sep=12pt,center,rounded=true]{section title}
-      \usebeamerfont{section title}\insertsection\par
-    \end{beamercolorbox}
-  \endgroup
-}
-
+\setbeamertemplate{headline}{}
 
 % Definitions for title page
 % Maybe define graphic sizes in terms of pagesize fractions?
