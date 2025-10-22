@@ -8,9 +8,9 @@ outputformatoptions := "format=rgb";
 
 prologues := 3;
 
-tablebgcolor := hexrgbcolor("F2")("ED")("87");
+tablebgcolor := hexrgbcolor("99")("77")("00");
 % Label actually means tuple here.
-labelbgcolor := hexrgbcolor("FF")("E3")("B2");
+labelbgcolor := hexrgbcolor("EE")("CC")("66");
 
 color	color_save, color_dead;
 
