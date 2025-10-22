@@ -342,6 +342,7 @@
     \item cron-like scheduling. Squeeze table if the portion of bloat exceeded
       threshold specified by the DBA.
     \item Can move tables and indexes to different tablespaces.
+    \item Cannot process \emph{unlogged} tables.
   \end{itemize}
 \end{frame}
 
@@ -466,7 +467,7 @@ REPACK (CONCURRENTLY) USING INDEX;
     \item Better control over repacking multiple tables
     \item Allow tables/indexes to move tablespace
     \item Migrate table to another table AM (zheap, OrioleDB, ...)
-    \item Modify \texttt{ALTER TABLE} to rewrite tables using \texttt{REPACK} (?)
+    \item Modify \texttt{ALTER TABLE} to rewrite tables using concurrent repack
   \end{itemize}
 \end{frame}
 
