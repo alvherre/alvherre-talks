@@ -12,7 +12,7 @@ ALLPNGS = $(ALLSRCS:.mp=.png)
 
 images: $(ALLPNGS)
 
-%.png: ../metapostgres/table.mp
+%.png: ../metapostgres/table.mp ../metapostgres/common.mp
 
 %.png: %.mp
 	mpost -s 'outputformat="png"' -s 'outputtemplate="%j.%{outputformat}"' -mem=internalvars -tex ../metapostgres/mpcache $<
